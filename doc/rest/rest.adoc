@@ -1,0 +1,44 @@
+== RESTful API
+
+=== JSON Schemas
+
+NOTE: To proof a JSON file, your working directory has to be the path were the JSON Schema files are located.
+
+==== Bill
+
+A simple representation of a bill.
+Includes not only information given by an issuer but also auto generated data.
+
+.JSON Schema of a bill
+[source,json]
+----
+include::code/bill.schema.json[]
+----
+
+The actual billing number is a superset of two properties: `date` in the format `20060102` appended with two last digits of `referenceCount`.
+
+NOTE: If the billing address is null, it is meant to be the delivery address.
+
+==== Category
+
+A simple representation of a category.
+Each category is able to have its own sub-categories, so it's a recursive relation.
+
+[source,json]
+----
+include::code/category.schema.json[]
+----
+
+==== Score
+
+A simple representation of a score.
+
+[source,json]
+----
+include::code/score.schema.json[]
+----
+
+Each score will have an example PDF and an example audio.
+Both are located on the server with their id as filenames.
+
+NOTE: The scores `category` property aren't persisted in the database, its only purpose is to display it on details without a join.

@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "bill",
+  "definitions": {
+    "address": {
+      "properties": {
+        "city": {
+          "type": "string"
+        },
+        "postCode": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "streetNumber": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "city",
+        "postCode",
+        "state",
+        "street",
+        "streetNumber"
+      ]
+    }
+  },
+  "properties": {
+    "billingAddress": {
+      "$ref": "#/definitions/address"
+    },
+    "company": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "deliveryAddress": {
+      "$ref": "#/definitions/address"
+    },
+    "email": {
+      "type": "string",
+      "format": "idn-email"
+    },
+    "fistName": {
+      "type": "string"
+    },
+    "id": {
+      "type": "number"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "payed": {
+      "type": "boolean"
+    },
+    "referenceCount": {
+      "type": "number"
+    },
+    "salutation": {
+      "type": "string"
+    },
+    "telephone": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "date",
+    "deliveryAddress",
+    "email",
+    "firstName",
+    "id",
+    "lastName",
+    "payed",
+    "referenceCount"
+  ]
+}
