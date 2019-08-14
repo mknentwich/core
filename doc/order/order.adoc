@@ -6,7 +6,38 @@
 
 This chapter describes how to handle new orders.
 
-=== Do the request
+.Activity diagram when a user orders something
+[plantuml,order-activity,svg]
+....
+@startuml
+
+title Issue an order
+
+start
+
+:Click order;
+:Fill data into form;
+:Send form to REST Wrapper;
+:REST Wrapper triggers real REST Call;
+:Core checks data;
+if (Data correct?) then (yes)
+  :Data will be proccessed;
+  :Data persists into the database;
+  :Issuer receives an email with the order (and bill?);
+  :The owner receives the order;
+  :REST Call returns persited object;
+else (no)
+  :REST Call returns an error;
+endif
+
+:Wrapper redirects to result page;
+
+stop
+
+@enduml
+....
+
+=== Do the API request
 
 The first step which is required to create a new order is to send a `POST` to `{order-url}` with the following fields:
 
