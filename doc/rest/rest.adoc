@@ -4,21 +4,6 @@
 
 NOTE: To proof a JSON file, your working directory has to be the path were the JSON Schema files are located.
 
-==== Bill [[bill]]
-
-A simple representation of a bill.
-Includes not only information given by an issuer but also auto generated data.
-
-.JSON Schema of a bill
-[source,json]
-----
-include::code/bill.schema.json[]
-----
-
-The actual billing number is a superset of two properties: `date` in the format `20060102` appended with two last digits of `referenceCount`.
-
-NOTE: If the billing address is null, it is meant to be the delivery address.
-
 ==== Category
 
 A simple representation of a category.
@@ -28,6 +13,21 @@ Each category is able to have its own sub-categories, so it's a recursive relati
 ----
 include::code/category.schema.json[]
 ----
+
+==== Order [[order]]
+
+A simple representation of a order.
+Includes not only information given by an issuer but also auto generated data.
+
+.JSON Schema of an order
+[source,json]
+----
+include::code/order.schema.json[]
+----
+
+The actual billing number is a superset of two properties: `date` in the format `20060102` appended with two last digits of `referenceCount`.
+
+NOTE: If the billing address is null, it is meant to be the delivery address.
 
 ==== Score
 

@@ -38,4 +38,4 @@ If the request was successful, certain things will happen:
 . An email will be send to the issuer with further details (and the bill?).
 . The owner receives an email in order to prepare the delivery.
 
-NOTE: The response will be a single instance of a bill, for further details see <<bill>>.
+NOTE: The response will be a single instance of a bill, for further details see <<order>>.

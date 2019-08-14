@@ -1,5 +1,6 @@
 :icons: font
 :toc:
+:source-highlighter: coderay
 
 = Core Application of the Nentwich Verlag
 
