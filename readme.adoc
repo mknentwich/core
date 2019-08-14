@@ -1,6 +1,11 @@
+:icons: font
+:toc:
+
 = Core Application of the Nentwich Verlag
 
 This is the core application of the Nentwich Verlag.
 Its purpose is to hold all data such as the database, PDFs and Audios and represent is correctly through an RESTful API.
 
 include::doc/rest/rest.adoc[]
+
+include::doc/order/order.adoc[]

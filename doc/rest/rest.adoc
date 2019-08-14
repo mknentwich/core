@@ -4,7 +4,7 @@
 
 NOTE: To proof a JSON file, your working directory has to be the path were the JSON Schema files are located.
 
-==== Bill
+==== Bill [[bill]]
 
 A simple representation of a bill.
 Includes not only information given by an issuer but also auto generated data.

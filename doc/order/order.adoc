@@ -1,0 +1,41 @@
+:order-url: /api/bills
+:chck: icon:check[]
+:nch: icon:times[]
+
+== Order
+
+This chapter describes how to handle new orders.
+
+=== Do the request
+
+The first step which is required to create a new order is to send a `POST` to `{order-url}` with the following fields:
+
+[cols="a,a,a,a"]
+|===
+|Name|Description|Type|Required
+|`addressesEqual`|`true` if billing and delivery addresses are the equal|`bool`|{chck}
+|`bcity`|Billing city|`string` 1.5+|{nch} only needed if billing address is different from delivery address
+|`bpostCode`|Billing post code|`string`
+|`bstate`|Billing state|`string`
+|`bstreet`|Billing street|`string`
+|`bstreetNumber`|Billing street number|`string`
+|`city`|Delivery city|`string`|{chck}
+|`postCode`|Delivery post code|`string`|{chck}
+|`state`|Delivery state|`string`|{chck}
+|`street`|Delivery street|`string`|{chck}
+|`streetNumber`|Delivery street number|`string`|{chck}
+|`company`|Company/Music Society/Band|`string`|{nch}
+|`email`|Email of the issuer|`string`|{chck}
+|`firstName`|First name of the issuer|`string`|{chck}
+|`lastName`|Last name of the issuer|`string`|{chck}
+|`salutation`|Salutation of the issuer|`string`|{chck}
+|`telephone`|Phone number of the issuer|`string`|{nch}
+|===
+
+If the request was successful, certain things will happen:
+
+. The order will be persisted into the database.
+. An email will be send to the issuer with further details (and the bill?).
+. The owner receives an email in order to prepare the delivery.
+
+NOTE: The response will be a single instance of a bill, for further details see <<bill>>.
