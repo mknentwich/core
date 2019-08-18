@@ -10,3 +10,5 @@ Its purpose is to hold all data such as the database, PDFs and Audios and repres
 include::doc/rest/rest.adoc[]
 
 include::doc/order/order.adoc[]
+
+include::doc/database/database.adoc[]
