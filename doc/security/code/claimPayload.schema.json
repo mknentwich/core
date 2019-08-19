@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "claimPayload",
+  "type": "object",
+  "properties": {
+    "exp": {
+      "type": "number"
+    },
+    "lastChange": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "exp",
+    "lastChange",
+    "name"
+  ]
+}

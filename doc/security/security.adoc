@@ -1,0 +1,41 @@
+== Security
+
+This chapter contains everything about security according to this project.
+
+=== Authentication
+
+==== Logging in
+
+To log in against the whole service, simply request a `POST` on `/auth/login` with the following body:
+
+[source,json]
+----
+include::code/credentials.schema.json[]
+----
+
+If the request was successful, the server will return a JWT.
+This JTW consists of a Base64 encoded header, a Base64 payload and a signature which is a hash calculted with the algorithmus given in the header from the rest.
+All three parts are separated by a dot.
+
+.Raw header of the claim
+[source,json]
+----
+include::code/claimHeader.schema.json[]
+----
+
+.Raw payload of the claim
+[source,json]
+----
+include::code/claimPayload.schema.json[]
+----
+
+NOTE: Read https://tools.ietf.org/html/rfc7519[this] or https://jwt.io[this] for further information.
+
+==== Usage of the JWT
+
+To use the token, it has to be added to the following HTTP header attribute: `Authorization: Bearer {JWT}`.
+
+==== Renewal
+
+To renew a token, simply do a request with a valid (not expired!) token on `/auth/refresh`.
+The response will be the same as in the request with the credentials.
