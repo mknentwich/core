@@ -57,10 +57,10 @@ entity "addresses" as add {
 
 ' relations
 
-cat ||..o| cat
+cat |o..|{ cat
 cat |o..|{ sco
-ord ||..|| add
-ord ||..o| add
+ord }|..|| add
+ord }|..|| add
 
 @enduml
 ....
