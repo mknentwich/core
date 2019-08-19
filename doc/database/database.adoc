@@ -15,14 +15,14 @@ skinparam linetype ortho
 ' entities
 
 entity "categories" as cat {
-  ***id : integer <<pk, nn, ai>>**
+  * **id : integer <<pk, nn, ai>>**
   --
   *name : text <<nn, uq>>
   *<color:green>parentId : integer <<fk>></color>
 }
 
 entity "scores" as sco {
-  ***id : integer <<pk, nn, ai>>**
+  * **id : integer <<pk, nn, ai>>**
   --
   *title : text <<nn>>
   *price : real <<nn>>
@@ -31,7 +31,7 @@ entity "scores" as sco {
 }
 
 entity "orders" as ord {
-  ***id : integer <<pk, nn, ai>>**
+  * **id : integer <<pk, nn, ai>>**
   --
   *<color:green>billingAddressId : integer <<fk>></color>
   *company : text
@@ -46,7 +46,7 @@ entity "orders" as ord {
 }
 
 entity "addresses" as add {
-  ***id : integer <<pk, nn, ai>>**
+  * **id : integer <<pk, nn, ai>>**
   --
   *city : text <<nn>>
   *postCode : text <<nn>>
