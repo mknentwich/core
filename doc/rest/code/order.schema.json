@@ -37,8 +37,7 @@
       "type": "string"
     },
     "date": {
-      "type": "string",
-      "format": "date"
+      "type": "number"
     },
     "deliveryAddress": {
       "$ref": "#/definitions/address"

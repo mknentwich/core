@@ -35,7 +35,7 @@ entity "orders" as ord {
   --
   *<color:green>billingAddressId : integer <<fk>></color>
   *company : text
-  *date : text <<nn>>
+  *date : integer <<nn>>
   *<color:green>deliveryAddressId : integer <<fk, nn>></color>
   *email : text <<nn>>
   *firstName : text <<nn>>
@@ -60,8 +60,8 @@ entity "users" {
   --
   *name : text <<nn>
   *password : text <<nn>
-  *lastChange : text <<nn>>
-  *lastLogin : text <<nn>>
+  *lastChange : integer <<nn>>
+  *lastLogin : integer <<nn>>
 }
 
 ' relations
