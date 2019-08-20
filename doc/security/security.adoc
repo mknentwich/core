@@ -39,3 +39,16 @@ To use the token, it has to be added to the following HTTP header attribute: `Au
 
 To renew a token, simply do a request with a valid (not expired!) token on `/auth/refresh`.
 The response will be the same as in the request with the credentials.
+
+==== User Information
+
+A request with the JWT header set to `/auth/self` will respond information about the user which corresponds to the JWT.
+In case of an invalid JWT, the server will return a `HTTP 403`.
+
+.User information response
+[source,json]
+----
+include::code/self.schema.json[]
+----
+
+TIP: This request is also recommended to check if a JWT is valid
