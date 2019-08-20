@@ -55,6 +55,15 @@ entity "addresses" as add {
   *streetNumber : text <<nn>>
 }
 
+entity "users" {
+  * **email : text <<pk, nn>>**
+  --
+  *name : text <<nn>
+  *password : text <<nn>
+  *lastChange : text <<nn>>
+  *lastLogin : text <<nn>>
+}
+
 ' relations
 
 cat |o..|{ cat
