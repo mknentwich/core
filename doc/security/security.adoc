@@ -15,7 +15,7 @@ include::code/credentials.schema.json[]
 ----
 
 If the request was successful, the server will return a JWT.
-This JTW consists of a Base64 encoded header, a Base64 payload and a signature which is a hash calculted with the algorithmus given in the header from the rest.
+This JWT consists of a Base64 encoded header, a Base64 payload and a signature which is a hash calculated with the algorithmus given in the header from the rest.
 All three parts are separated by a dot.
 
 .Raw header of the claim
