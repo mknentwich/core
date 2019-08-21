@@ -58,6 +58,7 @@ entity "addresses" as add {
 entity "users" {
   * **email : text <<pk, nn>>**
   --
+  *admin : integer <<nn>>
   *name : text <<nn>
   *password : text <<nn>
   *lastChange : integer <<nn>>
