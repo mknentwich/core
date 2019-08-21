@@ -14,3 +14,5 @@ include::doc/order/order.adoc[]
 include::doc/database/database.adoc[]
 
 include::doc/security/security.adoc[]
+
+include::doc/config/config.adoc[]

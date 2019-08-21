@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "config",
+  "type": "object",
+  "properties": {
+    "host": {
+      "type": "string"
+    },
+    "jwtExpirationMinutes": {
+      "type": "number"
+    },
+    "jwtSecret": {
+      "type": "string"
+    },
+    "sqliteFile": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "host",
+    "jwtExpirationMinutes",
+    "jwtSecret",
+    "sqliteFile"
+  ]
+}

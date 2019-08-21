@@ -1,0 +1,9 @@
+== Configuration
+
+Every package is meant to be, to has its own configuration which is included in the main configuration located at `config.json`.
+
+.Configuration specification
+[source,json]
+----
+include::code/config.schema.json[]
+----
