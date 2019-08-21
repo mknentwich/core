@@ -8,6 +8,7 @@ import (
 )
 
 const configFile = "config.json"
+var Conf Configuration
 
 //Struct for the configuration of the application.
 type Configuration struct {

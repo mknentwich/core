@@ -16,7 +16,7 @@ const (
 type LogLevel string
 
 //Defines the function type for a single log.
-type Log func(level LogLevel, format string, a interface{})
+type Log func(level LogLevel, format string, a ...interface{})
 
 //The central logger.
 var logger = log.New(os.Stdout, "", log.LstdFlags)
