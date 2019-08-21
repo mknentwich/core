@@ -40,7 +40,8 @@ entity "orders" as ord {
   *email : text <<nn>>
   *firstName : text <<nn>>
   *lastName :  text <<nn>>
-  *payed : integer <<nn>>
+  *<color:green>orderId : integer <<nn>></color>
+  *payed : integer <<fk, nn>>
   *referenceCount : text <<nn>>
   *salutation : text
 }
@@ -70,6 +71,7 @@ cat |o..|{ cat
 cat |o..|{ sco
 ord }|..|| add
 ord }|..|| add
+sco ||..|{ ord
 
 @enduml
 ....
