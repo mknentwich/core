@@ -8,6 +8,7 @@ This chapter contains everything about security according to this project.
 
 To log in against the whole service, simply request a `POST` on `/auth/login` with the following body:
 
+.Login body[[loginBody]]
 [source,json]
 ----
 include::code/credentials.schema.json[]
@@ -52,3 +53,9 @@ include::code/self.schema.json[]
 ----
 
 TIP: This request is also recommended to check if a JWT is valid
+
+==== Change password
+
+In order to change a password, one has to request a `POST` on `auth/password` with a <<loginBody, login body>>.
+
+NOTE: Only admins are allowed to change other users password.
