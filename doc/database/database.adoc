@@ -44,6 +44,8 @@ entity "orders" as ord {
   *payed : integer <<fk, nn>>
   *referenceCount : text <<nn>>
   *salutation : text
+  *scoreAmount : integer <<nn>>
+  *telephone: text
 }
 
 entity "addresses" as add {

@@ -64,6 +64,9 @@
     "salutation": {
       "type": "string"
     },
+    "scoreAmount": {
+      "type": "number"
+    },
     "telephone": {
       "type": "string"
     }
@@ -76,6 +79,7 @@
     "id",
     "lastName",
     "payed",
-    "referenceCount"
+    "referenceCount",
+    "scoreAmount"
   ]
 }
