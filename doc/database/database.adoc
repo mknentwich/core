@@ -44,7 +44,7 @@ entity "orders" as ord {
   *referenceCount : text <<nn>>
   *salutation : text
   *scoreAmount : integer <<nn>>
-  *<color:green>scoreId : integer <<nn>></color>
+  *<color:green>scoreId : integer <<fk, nn>></color>
   *telephone: text
 }
 
