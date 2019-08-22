@@ -46,7 +46,7 @@
       "type": "string",
       "format": "idn-email"
     },
-    "fistName": {
+    "firstName": {
       "type": "string"
     },
     "id": {
@@ -66,6 +66,9 @@
     },
     "scoreAmount": {
       "type": "number"
+    },
+    "scoreId": {
+      "type": "integer"
     },
     "telephone": {
       "type": "string"
