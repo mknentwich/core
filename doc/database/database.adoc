@@ -40,11 +40,11 @@ entity "orders" as ord {
   *email : text <<nn>>
   *firstName : text <<nn>>
   *lastName :  text <<nn>>
-  *<color:green>orderId : integer <<nn>></color>
   *payed : integer <<fk, nn>>
   *referenceCount : text <<nn>>
   *salutation : text
   *scoreAmount : integer <<nn>>
+  *<color:green>scoreId : integer <<nn>></color>
   *telephone: text
 }
 
