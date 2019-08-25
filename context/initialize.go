@@ -2,6 +2,7 @@ package context
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -26,9 +27,12 @@ func Initialize(services map[string]Serve) error {
 //Loops through all registered services, calls their Serve function and register their http handler.
 func serveServices(services map[string]Serve) {
 	for serviceId, serve := range services {
-		result := serve(func(level LogLevel, format string, a ...interface{}) {
+		result, err := serve(func(level LogLevel, format string, a ...interface{}) {
 			logger.Printf("%s: %s: %s", level, serviceId, fmt.Sprintf(format, a...))
 		})
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 		if result.HttpHandler != nil {
 			http.Handle("/"+serviceId+"/", http.StripPrefix("/"+serviceId, result.HttpHandler))
 		}

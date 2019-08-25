@@ -10,9 +10,9 @@ import (
 var log context.Log
 
 //Serve function for this package.
-func Serve(logger context.Log) context.ServiceResult {
+func Serve(logger context.Log) (context.ServiceResult, error) {
 	log = logger
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", utils.HttpImplement(log))
-	return context.ServiceResult{HttpHandler: mux}
+	return context.ServiceResult{HttpHandler: mux}, nil
 }

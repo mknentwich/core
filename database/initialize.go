@@ -3,11 +3,14 @@ package database
 import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/mknentwich/core/context"
 )
 
+var log context.Log
+
 // Initializes the database with the whole table structure
-func InitializeDb() error {
-	database, err := sql.Open("sqlite3", "./mknentwich.db")
+func initializeDb() error {
+	database, err := sql.Open("sqlite3", context.Conf.SQLiteFile)
 	if err != nil {
 		return err
 	}
@@ -21,4 +24,10 @@ func InitializeDb() error {
 		executable.Exec()
 	}
 	return err
+}
+
+//Serve call for the service registry
+func Serve(logger context.Log) (context.ServiceResult, error) {
+	log = logger
+	return context.ServiceResult{}, initializeDb()
 }
