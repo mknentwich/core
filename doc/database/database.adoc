@@ -62,8 +62,8 @@ entity "users" {
   * **email : text <<pk, nn>>**
   --
   *admin : integer <<nn>>
-  *name : text <<nn>
-  *password : text <<nn>
+  *name : text <<nn>>
+  *password : text <<nn>>
   *last_login : datetime <<nn>>
 }
 
