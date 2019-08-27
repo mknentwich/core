@@ -14,11 +14,39 @@ skinparam linetype ortho
 
 ' entities
 
+entity "addresses" as add {
+  * **id : integer <<pk, nn, ai>>**
+  --
+  *city : text <<nn>>
+  *post_code : text <<nn>>
+  *state : text <<nn>>
+  *street : text <<nn>>
+  *street_number : text <<nn>>
+}
+
 entity "categories" as cat {
   * **id : integer <<pk, nn, ai>>**
   --
   *name : text <<nn, uq>>
-  *<color:green>parentId : integer <<fk>></color>
+  *<color:green>parent_id : integer <<fk>></color>
+}
+
+entity "orders" as ord {
+  * **id : integer <<pk, nn, ai>>**
+  --
+  *<color:green>billing_address_id : integer <<fk>></color>
+  *company : text
+  *date : datetime <<nn, uq>>
+  *<color:green>delivery_address_id : integer <<fk, nn>></color>
+  *email : text <<nn>>
+  *first_name : text <<nn>>
+  *last_name :  text <<nn>>
+  *payed : datetime
+  *reference_count : text <<nn, uq>>
+  *salutation : text
+  *score_amount : integer <<nn>>
+  *<color:green>score_id : integer <<nn>></color>
+  *telephone: text
 }
 
 entity "scores" as sco {
@@ -27,45 +55,16 @@ entity "scores" as sco {
   *title : text <<nn>>
   *price : real <<nn>>
   *difficulty : integer <<nn>>
-  *<color:green>categoryId : integer <<fk>></color>
-}
-
-entity "orders" as ord {
-  * **id : integer <<pk, nn, ai>>**
-  --
-  *<color:green>billingAddressId : integer <<fk>></color>
-  *company : text
-  *date : integer <<nn>>
-  *<color:green>deliveryAddressId : integer <<fk, nn>></color>
-  *email : text <<nn>>
-  *firstName : text <<nn>>
-  *lastName :  text <<nn>>
-  *<color:green>orderId : integer <<nn>></color>
-  *payed : integer <<fk, nn>>
-  *referenceCount : text <<nn>>
-  *salutation : text
-  *scoreAmount : integer <<nn>>
-  *telephone: text
-}
-
-entity "addresses" as add {
-  * **id : integer <<pk, nn, ai>>**
-  --
-  *city : text <<nn>>
-  *postCode : text <<nn>>
-  *state : text <<nn>>
-  *street : text <<nn>>
-  *streetNumber : text <<nn>>
+  *<color:green>category_id : integer <<fk>></color>
 }
 
 entity "users" {
   * **email : text <<pk, nn>>**
   --
   *admin : integer <<nn>>
-  *name : text <<nn>
-  *password : text <<nn>
-  *lastChange : integer <<nn>>
-  *lastLogin : integer <<nn>>
+  *name : text <<nn>>
+  *password : text <<nn>>
+  *last_login : datetime <<nn>>
 }
 
 ' relations
