@@ -18,7 +18,7 @@ func initializeDb() error {
 	if err != nil {
 		return err
 	}
-	database = db.Exec("pragma foreign_keys = on;").AutoMigrate(&Address{}, &Category{}, &Order{}, &Score{}, &User{}).Set("gorm:auto_preload", true)
+	database = db.Exec("pragma foreign_keys = on;").AutoMigrate(&Address{}, &Category{}, &Order{}, &Score{}, &User{})
 	return err
 }
 
