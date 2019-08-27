@@ -1,29 +1,30 @@
 package database
 
 import (
-	"database/sql"
+	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/mknentwich/core/context"
 )
 
+//log function for the database package
 var log context.Log
+
+//database instance pointer
+var database *gorm.DB
 
 // Initializes the database with the whole table structure
 func initializeDb() error {
-	database, err := sql.Open("sqlite3", context.Conf.SQLiteFile)
+	db, err := gorm.Open("sqlite3", context.Conf.SQLiteFile)
 	if err != nil {
 		return err
 	}
-	defer database.Close()
-
-	for _, statement := range createStatements {
-		executable, err := database.Prepare(statement)
-		if err != nil {
-			return err
-		}
-		executable.Exec()
-	}
+	database = db.Exec("pragma foreign_keys = on;").AutoMigrate(&Address{}, &Category{}, &Order{}, &Score{}, &User{}).Set("gorm:auto_preload", true)
 	return err
+}
+
+//Receive the database instance pointer
+func Receive() *gorm.DB {
+	return database
 }
 
 //Serve call for the service registry
