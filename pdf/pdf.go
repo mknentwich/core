@@ -7,6 +7,7 @@ import (
 
 //Info of the Company/Person
 const sentenceTransfer = "Ich bitte Sie, den Betrag binnen 14 Tagen an das folgende Konto zu überweisen:"
+const sentenceNoTaxes = "Dieser Betrag enthält keine Umsatzsteuer aufgrund §6(2)27 Kleinunternehmerregelung."
 
 var ownAddress = []string{"Markus Nentwich", "Vereinsgasse 25/14", "A-1020 Wien", "Telefon: +43699 / 10329882", "E-Mail: nentwich94@gmx.at", "Webseite: "}
 var bankDataCategory = [4]string{"IBAN:", "BIC:", "Geldinstitut:", "Verwendungszweck:"}
@@ -20,9 +21,10 @@ const (
 	marginSide            = 25
 	marginTop             = 12.5
 	marginCustomerAddress = 50.8
-	marginTitle           = marginCustomerAddress + 50
-	marginArticles        = marginTitle + 20
-	marginBankData        = marginArticles + 90
+	marginTitle           = marginCustomerAddress + 40
+	marginArticles        = marginTitle + 25
+	marginBankData        = marginArticles + 80
+	marginNoTaxes         = marginBankData + 40
 )
 
 //Name of the used logo [svg file]
@@ -78,15 +80,20 @@ func createBillFPDF(referenceCount string) error {
 	pdf.SetY(marginTitle)
 	pdf.SetFontSize(sizeTitle)
 	pdf.SetFontStyle("b")
-	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator(referenceCount), "", 0, "", false, 0, "")
+	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator(referenceCount), "", 0, "B", false, 0, "")
 	pdf.SetFontSize(sizeText)
 	pdf.SetFontStyle("")
 	pdf.SetX(marginSide)
-	pdf.CellFormat(cellWidthMax, sizeText, "Wien, am "+time.Now().Format("02.01.2006"), "", 1, "RB", false, 0, "")
+	pdf.CellFormat(cellWidthMax, sizeText, "Wien, am "+time.Now().Format("02.01.2006"), "", 1, "RT", false, 0, "")
 	//Static load
 	loadArticles(pdf)
 	//Load bank data
 	loadBankData(pdf)
+	//Load no Taxes and Signature
+	pdf.SetX(marginSide)
+	pdf.SetY(marginNoTaxes)
+	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceNoTaxes), "", 0, "", false, 0, "")
+
 	err := pdf.OutputFileAndClose("example_bill.pdf")
 	return err
 }
