@@ -5,14 +5,6 @@ import (
 	"time"
 )
 
-//Info of the Company/Person
-const sentenceTransfer = "Ich bitte Sie, den Betrag binnen 14 Tagen an das folgende Konto zu überweisen:"
-const sentenceNoTaxes = "Dieser Betrag enthält keine Umsatzsteuer aufgrund §6(2)27 Kleinunternehmerregelung."
-
-var ownAddress = []string{"Markus Nentwich", "Vereinsgasse 25/14", "A-1020 Wien", "Telefon: +43699 / 10329882", "E-Mail: nentwich94@gmx.at", "Webseite: "}
-var bankDataCategory = [4]string{"IBAN:", "BIC:", "Geldinstitut:", "Verwendungszweck:"}
-var bankData = [4]string{"AT40 3209 2000 0025 8475", "RLNWATWWGAE", "RAIFFEISEN-REGIONALBANK", ""}
-
 //Numeric Layout constantes for right spacing inside the pdf
 const (
 	sizeHeader            = 10
@@ -27,6 +19,27 @@ const (
 	marginNoTaxes         = marginBankData + 40
 )
 
+type ownAddress struct {
+	name    string
+	street  string
+	city    string
+	phone   string
+	email   string
+	website string
+}
+
+//Struct for the bankdata
+type bankData struct {
+	iban      string
+	bic       string
+	institute string
+	reference string
+}
+
+//Info of the Company/Person
+const sentenceTransfer = "Ich bitte Sie, den Betrag binnen 14 Tagen an das folgende Konto zu überweisen:"
+const sentenceNoTaxes = "Dieser Betrag enthält keine Umsatzsteuer aufgrund §6(2)27 Kleinunternehmerregelung."
+
 //Name of the used logo [svg file]
 const svgEigenverlag = "nentwich.svg"
 
@@ -36,19 +49,45 @@ var err error
 var translator func(string) string
 var cellWidthMax float64
 
+func initBankData() *bankData {
+	return &bankData{
+		iban:      "AT40 3209 2000 0025 8475",
+		bic:       "RLNWATWWGAE",
+		institute: "RAIFFEISEN-REGIONALBANK",
+		reference: "",
+	}
+}
+
+func initOwnAddress() *ownAddress {
+	return &ownAddress{
+		name:    "Markus Nentwich",
+		street:  "Vereinsgasse 25/14",
+		city:    "A-1020 Wien",
+		phone:   "Telefon: +43699 / 10329882",
+		email:   "E-Mail: nentwich94@gmx.at",
+		website: "Webseite: ",
+	}
+}
+
+func initializePdfGeneration() error {
+	var address = initOwnAddress()
+	var bank = initBankData()
+	err := createBillPdf(*address, *bank)
+	return err
+}
+
 //Creates the bill of an order as a pdf
-func createBillFPDF(referenceCount string) error {
+func createBillPdf(address ownAddress, bank bankData) error {
 	//Metadata and adding Page
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetFont("Arial", "", sizeText)
-	pdf.SetTitle("RechnungsNr_"+referenceCount, true)
+	pdf.SetTitle("RechnungsNr_referenceCount", true)
 	pdf.SetAuthor("Nentwich Eigenverlag", true)
 	pdf.AddPage()
 	pdf.SetMargins(marginSide, marginTop, marginSide)
 	translator = pdf.UnicodeTranslatorFromDescriptor("")
 	width, _ := pdf.GetPageSize()
 	cellWidthMax = width - 2*marginSide
-	bankData[3] = referenceCount
 	//MN Eigenverlag Image
 	sig, err = gofpdf.SVGBasicFileParse(svgEigenverlag)
 	if err == nil {
@@ -69,10 +108,18 @@ func createBillFPDF(referenceCount string) error {
 	pdf.SetX(marginSide)
 	pdf.SetY(marginTop)
 	pdf.SetFontSize(sizeHeader)
-	for _, row := range ownAddress {
-		pdf.CellFormat(cellWidthMax, sizeHeader, translator(row), "", 0, "R", false, 0, "")
-		pdf.Ln(sizeHeader / 2)
-	}
+	pdf.CellFormat(cellWidthMax, sizeHeader, translator(address.name), "", 0, "R", false, 0, "")
+	pdf.Ln(sizeHeader / 2)
+	pdf.CellFormat(cellWidthMax, sizeHeader, translator(address.street), "", 0, "R", false, 0, "")
+	pdf.Ln(sizeHeader / 2)
+	pdf.CellFormat(cellWidthMax, sizeHeader, translator(address.city), "", 0, "R", false, 0, "")
+	pdf.Ln(sizeHeader / 2)
+	pdf.CellFormat(cellWidthMax, sizeHeader, translator(address.phone), "", 0, "R", false, 0, "")
+	pdf.Ln(sizeHeader / 2)
+	pdf.CellFormat(cellWidthMax, sizeHeader, translator(address.email), "", 0, "R", false, 0, "")
+	pdf.Ln(sizeHeader / 2)
+	pdf.CellFormat(cellWidthMax, sizeHeader, translator(address.website), "", 0, "R", false, 0, "")
+
 	//Static load
 	loadBillingAddress(pdf)
 	//Title and Date of today
@@ -80,7 +127,7 @@ func createBillFPDF(referenceCount string) error {
 	pdf.SetY(marginTitle)
 	pdf.SetFontSize(sizeTitle)
 	pdf.SetFontStyle("b")
-	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator(referenceCount), "", 0, "B", false, 0, "")
+	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator("referenceCount"), "", 0, "B", false, 0, "")
 	pdf.SetFontSize(sizeText)
 	pdf.SetFontStyle("")
 	pdf.SetX(marginSide)
@@ -88,7 +135,7 @@ func createBillFPDF(referenceCount string) error {
 	//Static load
 	loadArticles(pdf)
 	//Load bank data
-	loadBankData(pdf)
+	loadBankData(bank, pdf)
 	//Load no Taxes and Signature
 	pdf.SetX(marginSide)
 	pdf.SetY(marginNoTaxes)
@@ -146,14 +193,21 @@ func loadArticles(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 }
 
 //Paint data of the bank connection
-func loadBankData(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
+func loadBankData(bank bankData, pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 	pdf.SetX(marginSide)
 	pdf.SetY(marginBankData)
 	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceTransfer), "", 1, "", false, 0, "")
-	for index, value := range bankDataCategory {
-		pdf.Cell(cellWidthMax/4, sizeText, value)
-		pdf.Cell(cellWidthMax/4, sizeText, bankData[index])
-		pdf.Ln(sizeText / 2)
-	}
+	pdf.Cell(cellWidthMax/4, sizeText, "IBAN:")
+	pdf.Cell(cellWidthMax/4, sizeText, bank.iban)
+	pdf.Ln(sizeText / 2)
+	pdf.Cell(cellWidthMax/4, sizeText, "BIC:")
+	pdf.Cell(cellWidthMax/4, sizeText, bank.bic)
+	pdf.Ln(sizeText / 2)
+	pdf.Cell(cellWidthMax/4, sizeText, "Geldinstitut:")
+	pdf.Cell(cellWidthMax/4, sizeText, bank.institute)
+	pdf.Ln(sizeText / 2)
+	pdf.Cell(cellWidthMax/4, sizeText, "Verwendungszweck:")
+	pdf.Cell(cellWidthMax/4, sizeText, bank.reference)
+	pdf.Ln(sizeText / 2)
 	return pdf
 }
