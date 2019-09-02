@@ -16,6 +16,8 @@ const (
 	marginTitle           = marginCustomerAddress + 40
 	marginArticles        = marginTitle + 25
 	marginBankData        = marginArticles + 80
+	marginQrCode          = marginBankData + 10
+	marginQrCodeSide      = marginSide + 110
 	marginNoTaxes         = marginBankData + 40
 )
 
@@ -30,10 +32,11 @@ type ownAddress struct {
 
 //Struct for the bankdata
 type bankData struct {
-	iban      string
-	bic       string
-	institute string
-	reference string
+	iban       string
+	ibanPretty string
+	bic        string
+	institute  string
+	purpose    string
 }
 
 //Info of the Company/Person
@@ -51,10 +54,11 @@ var cellWidthMax float64
 
 func initBankData() *bankData {
 	return &bankData{
-		iban:      "AT40 3209 2000 0025 8475",
-		bic:       "RLNWATWWGAE",
-		institute: "RAIFFEISEN-REGIONALBANK",
-		reference: "",
+		iban:       "AT403209200000258475",
+		ibanPretty: "AT40 3209 2000 0025 8475",
+		bic:        "RLNWATWWGAE",
+		institute:  "RAIFFEISEN-REGIONALBANK",
+		purpose:    "TESTÜBERWEISUNG",
 	}
 }
 
@@ -198,16 +202,33 @@ func loadBankData(bank bankData, pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 	pdf.SetY(marginBankData)
 	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceTransfer), "", 1, "", false, 0, "")
 	pdf.Cell(cellWidthMax/4, sizeText, "IBAN:")
-	pdf.Cell(cellWidthMax/4, sizeText, bank.iban)
+	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.ibanPretty))
 	pdf.Ln(sizeText / 2)
 	pdf.Cell(cellWidthMax/4, sizeText, "BIC:")
-	pdf.Cell(cellWidthMax/4, sizeText, bank.bic)
+	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.bic))
 	pdf.Ln(sizeText / 2)
 	pdf.Cell(cellWidthMax/4, sizeText, "Geldinstitut:")
-	pdf.Cell(cellWidthMax/4, sizeText, bank.institute)
+	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.institute))
 	pdf.Ln(sizeText / 2)
 	pdf.Cell(cellWidthMax/4, sizeText, "Verwendungszweck:")
-	pdf.Cell(cellWidthMax/4, sizeText, bank.reference)
+	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.purpose))
 	pdf.Ln(sizeText / 2)
+	paintQRCode(generateQrCode(bank), pdf)
 	return pdf
+}
+
+func paintQRCode(bitmap [][]bool, pdf *gofpdf.Fpdf) {
+	var qrScale = 0.5
+	for rows := range bitmap {
+		for collums := range bitmap[rows] {
+			if bitmap[rows][collums] == true {
+				pdf.SetDrawColor(0, 0, 0)
+				pdf.SetFillColor(0, 0, 0)
+			} else {
+				pdf.SetDrawColor(255, 255, 255)
+				pdf.SetFillColor(255, 255, 255)
+			}
+			pdf.Rect(marginQrCodeSide+(float64(rows)*qrScale), marginQrCode+(float64(collums)*qrScale), qrScale, qrScale, "DF")
+		}
+	}
 }
