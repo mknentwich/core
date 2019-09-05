@@ -30,8 +30,8 @@ func initializeQrDataFields(bank bankData) *qrDataFields {
 		iban:           bank.iban,
 		amountCurrency: "EUR0.01",
 		purpose:        "",
-		reference:      "",
-		text:           bank.purpose,
+		reference:      bank.reference,
+		text:           "",
 		display:        "Ihre Transaktion an Nentwich Verlag wird vorbereitet",
 	}
 }

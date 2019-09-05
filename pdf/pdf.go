@@ -36,7 +36,7 @@ type bankData struct {
 	ibanPretty string
 	bic        string
 	institute  string
-	purpose    string
+	reference  string
 }
 
 //Info of the Company/Person
@@ -58,7 +58,7 @@ func initBankData() *bankData {
 		ibanPretty: "AT40 3209 2000 0025 8475",
 		bic:        "RLNWATWWGAE",
 		institute:  "RAIFFEISEN-REGIONALBANK",
-		purpose:    "TESTÜBERWEISUNG",
+		reference:  "[referenceCount]",
 	}
 }
 
@@ -85,7 +85,7 @@ func createBillPdf(address ownAddress, bank bankData) error {
 	//Metadata and adding Page
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetFont("Arial", "", sizeText)
-	pdf.SetTitle("RechnungsNr_referenceCount", true)
+	pdf.SetTitle("RechnungsNr_[referenceCount]", true)
 	pdf.SetAuthor("Nentwich Eigenverlag", true)
 	pdf.AddPage()
 	pdf.SetMargins(marginSide, marginTop, marginSide)
@@ -131,7 +131,7 @@ func createBillPdf(address ownAddress, bank bankData) error {
 	pdf.SetY(marginTitle)
 	pdf.SetFontSize(sizeTitle)
 	pdf.SetFontStyle("b")
-	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator("referenceCount"), "", 0, "B", false, 0, "")
+	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator("[referenceCount]"), "", 0, "B", false, 0, "")
 	pdf.SetFontSize(sizeText)
 	pdf.SetFontStyle("")
 	pdf.SetX(marginSide)
@@ -210,8 +210,10 @@ func loadBankData(bank bankData, pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 	pdf.Cell(cellWidthMax/4, sizeText, "Geldinstitut:")
 	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.institute))
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax/4, sizeText, "Verwendungszweck:")
-	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.purpose))
+	pdf.Cell(cellWidthMax/4, sizeText, "Zahlungsreferenz:")
+	pdf.SetFontStyle("b")
+	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.reference))
+	pdf.SetFontStyle("")
 	pdf.Ln(sizeText / 2)
 	paintQRCode(generateQrCode(bank), pdf)
 	return pdf
