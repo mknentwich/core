@@ -19,3 +19,11 @@ func Serve() {
 		log.Fatalf("Fatal while start up application: %s", err.Error())
 	}
 }
+
+//Calls the context to initialize everything with a custom host and port
+func ServeCustomConfig(host string, sqLiteFile string) {
+	err := context.InitializeCustomConfig(services, host, sqLiteFile)
+	if err != nil {
+		log.Fatalf("Fatal while start up application: %s", err.Error())
+	}
+}

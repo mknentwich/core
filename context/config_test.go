@@ -16,12 +16,14 @@ func unexpected(t *testing.T, err error) {
 //Removes config file before and after every test case.
 func TestMain(m *testing.M) {
 	os.Remove(configFile)
+	os.Remove(customConfigFile)
 	code := m.Run()
 	os.Remove(configFile)
+	os.Remove(customConfigFile)
 	os.Exit(code)
 }
 
-//Tests if a config will we generated when no exists.
+//Tests if a config will be generated when no exists.
 func TestConfigCreation(t *testing.T) {
 	_, err := config()
 	if err != nil {
@@ -43,5 +45,13 @@ func TestConfigRead(t *testing.T) {
 	unexpected(t, err)
 	if read.Host != custom.Host || read.JWTExpirationMinutes != custom.JWTExpirationMinutes || read.SQLiteFile != custom.SQLiteFile {
 		t.Errorf("Expected configuration: %v, but got: %v", *custom, *read)
+	}
+}
+
+//Tests if a config will be generated with custom attributes
+func TestCustomConfigCreation(t *testing.T) {
+	_, err := customConfig("0.0.0.0:9600", ":memory:")
+	if err != nil {
+		t.Errorf("Error on creating a config file: %s", err.Error())
 	}
 }
