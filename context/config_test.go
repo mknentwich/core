@@ -47,11 +47,3 @@ func TestConfigRead(t *testing.T) {
 		t.Errorf("Expected configuration: %v, but got: %v", *custom, *read)
 	}
 }
-
-//Tests if a config will be generated with custom attributes
-func TestCustomConfigCreation(t *testing.T) {
-	_, err := customConfig("0.0.0.0:9600", ":memory:")
-	if err != nil {
-		t.Errorf("Error on creating a config file: %s", err.Error())
-	}
-}
