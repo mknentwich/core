@@ -21,6 +21,23 @@ const (
 	marginNoTaxes         = marginBankData + 40
 )
 
+type OrderResultPDF struct {
+	City         string
+	PostCode     string
+	State        string
+	Street       string
+	StreetNumber string
+	ID           uint
+	Company      string
+	Date         int
+	FirstName    string
+	LastName     string
+	Salutation   string
+	ScoreAmount  int
+	Title        string
+	Price        float64
+}
+
 type ownAddress struct {
 	name    string
 	street  string

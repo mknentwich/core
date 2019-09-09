@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/mknentwich/core/database"
+	"github.com/mknentwich/core/pdf"
 )
 
 type DataQuery func() interface{}
@@ -17,25 +18,9 @@ func QueryCategoriesWithChildrenAndScores() interface{} {
 	return categories
 }
 
-type PDFOrderResult struct {
-	City         string
-	PostCode     string
-	State        string
-	Street       string
-	StreetNumber string
-	ID           uint
-	Company      string
-	Date         int
-	FirstName    string
-	LastName     string
-	Salutation   string
-	ScoreAmount  int
-	Title        string
-	Price        float64
-}
-
-func QueryOrderFromIdForPDF(id int) PDFOrderResult {
-	var pdfOrderResult PDFOrderResult
+//Returns data for bill handling as struct
+func QueryOrderFromIdForPDF(id int) pdf.OrderResultPDF {
+	var pdfOrderResult pdf.OrderResultPDF
 	database.Receive().Table("orders").Select("addresses.city, addresses.post_code, addresses.state, addresses.street, addresses.street_number, "+
 		"orders.id, orders.company, orders.date, orders.first_name, orders.last_name, orders.salutation, orders.score_amount, scores.title, scores.price").Joins("inner join addresses on orders.billing_address_id = addresses.id").
 		Joins("inner join scores on orders.score_id = scores.id").Where("orders.id = ?", id).Find(&pdfOrderResult).Scan(&pdfOrderResult)

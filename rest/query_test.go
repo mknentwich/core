@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
+	"github.com/mknentwich/core/pdf"
 	"os"
 	"reflect"
 	"testing"
@@ -20,7 +21,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-//Tests inserts of all tables
+//Tests inserts of all tables and compares the result of the loaded order with the local one
 func TestPDFOrderResult(t *testing.T) {
 	address := database.Address{
 		City:         "Hürth",
@@ -70,7 +71,7 @@ func TestPDFOrderResult(t *testing.T) {
 		t.Errorf("Error on inserting at the orders table: %s", err.Error())
 	}
 	result := QueryOrderFromIdForPDF(1)
-	expectedResult := PDFOrderResult{
+	expectedResult := pdf.OrderResultPDF{
 		City:         "Hürth",
 		PostCode:     "50354",
 		State:        "DEUTSCHLAND",
