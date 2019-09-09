@@ -8,7 +8,6 @@ import (
 )
 
 const configFile = "config.json"
-const customConfigFile = "customConfig.json"
 
 var Conf Configuration
 
@@ -52,29 +51,6 @@ func config() (*Configuration, error) {
 	configuration := &Configuration{}
 	err = decoder.Decode(configuration)
 	return configuration, err
-	if err != nil {
-		return configuration, err
-	}
-	return configuration, conf.Close()
-}
-
-//Creates configuration file from custom attributes
-func customConfig(host string, sqLiteFile string) (*Configuration, error) {
-	conf, err := os.Create(customConfigFile)
-	if err != nil {
-		return nil, err
-	}
-	encoder := json.NewEncoder(conf)
-	encoder.SetIndent("", "  ")
-	secret := make([]byte, 16)
-	rand.Read(secret)
-	configuration := &Configuration{
-		Host:                 host,
-		JWTExpirationMinutes: 5,
-		JWTSecret:            fmt.Sprintf("%x", secret),
-		SQLiteFile:           sqLiteFile,
-	}
-	err = encoder.Encode(configuration)
 	if err != nil {
 		return configuration, err
 	}
