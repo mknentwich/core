@@ -1,9 +1,11 @@
 package rest
 
 import (
+	"errors"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
 	"github.com/mknentwich/core/pdf"
+	"net/http"
 	"os"
 	"reflect"
 	"testing"
@@ -11,13 +13,17 @@ import (
 
 //Starts database service at begin of testing
 func TestMain(m *testing.M) {
-	context.InitializeCustomConfig(map[string]context.Serve{
-		"/db": database.Serve,
-	},
-		&context.Configuration{
-			Host:       "0.0.0.0:9400",
-			SQLiteFile: ":memory:",
-		})
+	go func() {
+		context.InitializeCustomConfig(map[string]context.Serve{
+			"db": database.Serve,
+		},
+			&context.Configuration{
+				Host:       "0.0.0.0:9400",
+				SQLiteFile: ":memory:",
+			})
+	}()
+	for err := errors.New(""); err != nil; _, err = http.Get("http://127.0.0.1:9400/") {
+	}
 	os.Exit(m.Run())
 }
 
