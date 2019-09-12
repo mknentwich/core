@@ -1,9 +1,9 @@
 package rest
 
 import (
+	"fmt"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
-	"github.com/mknentwich/core/pdf"
 	"os"
 	"reflect"
 	"testing"
@@ -21,8 +21,47 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-//Tests inserts of all tables and compares the result of the loaded order with the local one
 func TestPDFOrderResult(t *testing.T) {
+	insertTestData()
+	result := QueryOrderFromIdForPDF(1)
+	expectedResult := OrderResultPDF{
+		City:           "Hürth",
+		PostCode:       "50354",
+		State:          "DEUTSCHLAND",
+		Street:         "Kalscheurener Straße",
+		StreetNumber:   "89",
+		ID:             1,
+		Company:        "Millionen",
+		Date:           1568024628000,
+		FirstName:      "Günter",
+		LastName:       "Jauch",
+		Salutation:     "Herr",
+		ScoreAmount:    1,
+		Title:          "Eine letzte Runde (Blasorchesterfassung)",
+		Price:          39.9,
+		ReferenceCount: 2019091202,
+	}
+	if reflect.DeepEqual(result, expectedResult) == false {
+		t.Errorf("%s", "Object from the database and local Object aren't the same!")
+	}
+}
+
+//Tests, if the highest referenceCount was found
+func TestFindMaxReferenceCount(t *testing.T) {
+	insertTestData()
+	max := FindMaxReferenceCount()
+	if max != 2019091202 {
+		t.Errorf("%s", "ReferenceCount should be 2019091202, but was "+fmt.Sprint(max))
+	}
+	insertTestData2()
+	max = FindMaxReferenceCount()
+	if max != 2019091203 {
+		t.Errorf("%s", "ReferenceCount should be 2019091203, but was "+fmt.Sprint(max))
+	}
+}
+
+//Inserts TestData to the Database
+func insertTestData() {
 	address := database.Address{
 		City:         "Hürth",
 		PostCode:     "50354",
@@ -30,27 +69,18 @@ func TestPDFOrderResult(t *testing.T) {
 		Street:       "Kalscheurener Straße",
 		StreetNumber: "89",
 	}
-	err := InsertNewAddress(address)
-	if err != nil {
-		t.Errorf("Error on inserting at the addresses table: %s", err.Error())
-	}
+	InsertNewAddress(address)
 	category := database.Category{
 		Name: "Polka",
 	}
-	err = InsertNewCategory(category)
-	if err != nil {
-		t.Errorf("Error on inserting at the categories table: %s", err.Error())
-	}
+	InsertNewCategory(category)
 	score := database.Score{
 		CategoryID: 1,
 		Difficulty: 3,
 		Price:      39.9,
 		Title:      "Eine letzte Runde (Blasorchesterfassung)",
 	}
-	err = InsertNewScore(score)
-	if err != nil {
-		t.Errorf("Error on inserting at the scores table: %s", err.Error())
-	}
+	InsertNewScore(score)
 	order := database.Order{
 		BillingAddressID:  1,
 		Company:           "Millionen",
@@ -60,34 +90,50 @@ func TestPDFOrderResult(t *testing.T) {
 		FirstName:         "Günter",
 		LastName:          "Jauch",
 		Payed:             false,
-		ReferenceCount:    0,
 		Salutation:        "Herr",
 		ScoreID:           1,
 		ScoreAmount:       1,
 		Telephone:         "",
+		ReferenceCount:    2019091202,
 	}
-	err = InsertNewOrder(order)
-	if err != nil {
-		t.Errorf("Error on inserting at the orders table: %s", err.Error())
+	InsertNewOrder(order)
+}
+
+//Inserts TestData to the Database
+func insertTestData2() {
+	address := database.Address{
+		City:         "Wien",
+		PostCode:     "1050",
+		State:        "ÖSTERREICH",
+		Street:       "Spengergasse",
+		StreetNumber: "20",
 	}
-	result := QueryOrderFromIdForPDF(1)
-	expectedResult := pdf.OrderResultPDF{
-		City:         "Hürth",
-		PostCode:     "50354",
-		State:        "DEUTSCHLAND",
-		Street:       "Kalscheurener Straße",
-		StreetNumber: "89",
-		ID:           1,
-		Company:      "Millionen",
-		Date:         1568024628000,
-		FirstName:    "Günter",
-		LastName:     "Jauch",
-		Salutation:   "Herr",
-		ScoreAmount:  1,
-		Title:        "Eine letzte Runde (Blasorchesterfassung)",
-		Price:        39.9,
+	InsertNewAddress(address)
+	category := database.Category{
+		Name: "Polka",
 	}
-	if reflect.DeepEqual(result, expectedResult) == false {
-		t.Errorf("%s", "Object from the database and local Object aren't the same!")
+	InsertNewCategory(category)
+	score := database.Score{
+		CategoryID: 1,
+		Difficulty: 1,
+		Price:      24.37,
+		Title:      "Über den (Netzwerk)Brücken (Wiener Linien Fassung)",
 	}
+	InsertNewScore(score)
+	order := database.Order{
+		BillingAddressID:  1,
+		Company:           "",
+		Date:              1568024628000,
+		DeliveryAddressID: 1,
+		Email:             "hpberger@spengergasse.at",
+		FirstName:         "Hans-Peter",
+		LastName:          "Berger",
+		Payed:             false,
+		Salutation:        "Herr",
+		ScoreID:           1,
+		ScoreAmount:       1,
+		Telephone:         "",
+		ReferenceCount:    2019091203,
+	}
+	InsertNewOrder(order)
 }
