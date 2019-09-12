@@ -49,7 +49,7 @@ func httpRefresh(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	jwt := strings.Replace(r.Header.Get("Authorization"), "Bearer ", "", 1)
+	jwt := getJwt(r)
 	user, _, err := Check(jwt)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -71,7 +71,7 @@ func httpSelf(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	jwt := strings.Replace(r.Header.Get("Authorization"), "Bearer ", "", 1)
+	jwt := getJwt(r)
 	user, _, err := Check(jwt)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -87,4 +87,9 @@ func httpSelf(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 	}
+}
+
+//Get JWT from HTTP request.
+func getJwt(r *http.Request) string {
+	return strings.Replace(r.Header.Get("Authorization"), "Bearer ", "", 1)
 }
