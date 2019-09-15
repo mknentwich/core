@@ -6,20 +6,19 @@ import (
 	"net/http"
 )
 
-//Initializes the context.
-func initializeConfig() error {
-	config, err := config()
-	Conf = *config
-	return err
-}
-
 //Initializes the whole context.
 func Initialize(services map[string]Serve) error {
-	err := initializeConfig()
-	serveServices(services)
+	config, err := config()
 	if err != nil {
 		return err
 	}
+	return InitializeCustomConfig(services, config)
+}
+
+//Initializes the whole context with a custom configuration
+func InitializeCustomConfig(services map[string]Serve, configuration *Configuration) error {
+	Conf = *configuration
+	serveServices(services)
 	logger.Printf("listen on %s", Conf.Host)
 	return http.ListenAndServe(Conf.Host, nil)
 }

@@ -8,6 +8,8 @@ import (
 )
 
 const configFile = "config.json"
+const customConfigFile = "customConfig.json"
+
 var Conf Configuration
 
 //Struct for the configuration of the application.

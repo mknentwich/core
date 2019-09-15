@@ -15,9 +15,9 @@ type Category struct {
 	gorm.Model
 	Children []Category `gorm:"foreignkey:ParentID" json:"children"`
 	Name     string     `json:"name"`
-	Parent   *Category  `gorm:"PRELOAD:false"`
-	ParentID uint       `sql:"type:integer REFERENCES categories(id)" json:"-"`
-	Scores   []Score    `gorm:"foreignkey:CategoryID" json:"scores"`
+	Parent   *Category
+	ParentID *uint   `sql:"type:integer REFERENCES categories(id)" json:"-"`
+	Scores   []Score `gorm:"foreignkey:CategoryID" json:"scores"`
 }
 
 type Score struct {

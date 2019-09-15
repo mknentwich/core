@@ -13,3 +13,10 @@ func HttpImplement(log context.Log) http.HandlerFunc {
 		w.Write([]byte(msg))
 	}
 }
+
+func Rest(handler http.HandlerFunc) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set("Content-Type", "application/json")
+		handler(writer, request)
+	}
+}
