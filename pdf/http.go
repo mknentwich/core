@@ -2,6 +2,7 @@ package pdf
 
 import (
 	"fmt"
+	"github.com/mknentwich/core/auth"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/utils"
 	"net/http"
@@ -17,7 +18,7 @@ func Serve(logger context.Log) (context.ServiceResult, error) {
 	log = logger
 	mux := http.NewServeMux()
 	//TODO wrap order with `Auth`
-	mux.HandleFunc("/order/", pdfHeader(httpOrder))
+	mux.HandleFunc("/order/", auth.Auth(pdfHeader(httpOrder)))
 	return context.ServiceResult{HttpHandler: mux}, nil
 }
 
