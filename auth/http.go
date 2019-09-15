@@ -98,7 +98,7 @@ func getJwt(r *http.Request) string {
 func authenticated(handlerFunc http.HandlerFunc, admin bool) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		user, _, err := Check(getJwt(r))
-		if err == nil && user != nil && (user.Admin || !admin) {
+		if !context.Conf.Authentication || (err == nil && user != nil && (user.Admin || !admin)) {
 			handlerFunc(rw, r)
 		} else {
 			rw.WriteHeader(http.StatusForbidden)
