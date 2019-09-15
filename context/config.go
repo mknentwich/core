@@ -14,6 +14,7 @@ var Conf Configuration
 
 //Struct for the configuration of the application.
 type Configuration struct {
+	Authentication       bool   `json:"authentication"`
 	Host                 string `json:"host"`
 	JWTExpirationMinutes int    `json:"jwtExpirationMinutes"`
 	JWTSecret            string `json:"jwtSecret"`
@@ -25,6 +26,7 @@ func defaultConf() *Configuration {
 	secret := make([]byte, 16)
 	rand.Read(secret)
 	return &Configuration{
+		Authentication:       true,
 		Host:                 "0.0.0.0:9400",
 		JWTExpirationMinutes: 5,
 		JWTSecret:            fmt.Sprintf("%x", secret),

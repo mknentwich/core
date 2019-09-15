@@ -17,6 +17,7 @@ import (
 var albertUser = database.User{Email: "albert@diealberts.at", Password: "desisagaunzgeheimespwd", Name: "Albert Albert", Admin: true}
 var albert = Credentials{Email: albertUser.Email, Password: albertUser.Password}
 var config = context.Configuration{
+	Authentication:       true,
 	Host:                 "127.0.0.1:9400",
 	JWTExpirationMinutes: 10,
 	JWTSecret:            "sdvotkdoriuuuuuuuuuuuawbmet"}
