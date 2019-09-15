@@ -3,6 +3,9 @@
   "$id": "self",
   "type": "object",
   "properties": {
+    "admin": {
+      "type": "boolean"
+    },
     "email": {
       "type": "string",
       "format": "idn-email"

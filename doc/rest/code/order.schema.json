@@ -46,7 +46,7 @@
       "type": "string",
       "format": "idn-email"
     },
-    "fistName": {
+    "firstName": {
       "type": "string"
     },
     "id": {
@@ -56,13 +56,19 @@
       "type": "string"
     },
     "payed": {
-      "type": "boolean"
+      "type": "number"
     },
     "referenceCount": {
       "type": "number"
     },
     "salutation": {
       "type": "string"
+    },
+    "scoreAmount": {
+      "type": "number"
+    },
+    "scoreId": {
+      "type": "integer"
     },
     "telephone": {
       "type": "string"
@@ -76,6 +82,7 @@
     "id",
     "lastName",
     "payed",
-    "referenceCount"
+    "referenceCount",
+    "scoreAmount"
   ]
 }

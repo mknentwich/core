@@ -8,13 +8,14 @@ This chapter contains everything about security according to this project.
 
 To log in against the whole service, simply request a `POST` on `/auth/login` with the following body:
 
+.Login body[[loginBody]]
 [source,json]
 ----
 include::code/credentials.schema.json[]
 ----
 
 If the request was successful, the server will return a JWT.
-This JTW consists of a Base64 encoded header, a Base64 payload and a signature which is a hash calculted with the algorithmus given in the header from the rest.
+This JWT consists of a Base64 encoded header, a Base64 payload and a signature which is a hash calculated with the algorithmus given in the header from the rest.
 All three parts are separated by a dot.
 
 .Raw header of the claim
@@ -52,3 +53,9 @@ include::code/self.schema.json[]
 ----
 
 TIP: This request is also recommended to check if a JWT is valid
+
+==== Change password
+
+In order to change a password, one has to request a `POST` on `auth/password` with a <<loginBody, login body>>.
+
+NOTE: Only admins are allowed to change other users password.
