@@ -34,7 +34,7 @@ func serveServices(services map[string]Serve) {
 			Log: func(level LogLevel, format string, a ...interface{}) {
 				logger.Printf("%s: %s: %s", level, serviceId, fmt.Sprintf(format, a...))
 			}}
-		err := os.MkdirAll(genName, 0666)
+		err := os.MkdirAll(genName, 0777)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
