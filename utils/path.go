@@ -46,11 +46,11 @@ var safePendants = map[rune]string{
 
 func SanitizePath(path string) string {
 	path = strings.ToLower(path)
-	runes := []rune(path)
-	for i := len(runes); i >= 0; i-- {
-		if val, ok := safePendants[runes[i]]; ok {
-			path = path[:i] + val + path[i+1:]
+	pathRunes := []rune(path)
+	for i := len(pathRunes) - 1; i >= 0; i-- {
+		if val, ok := safePendants[pathRunes[i]]; ok {
+			pathRunes = append(pathRunes[:i], append([]rune(val), pathRunes[i+1:]...)...)
 		}
 	}
-	return path
+	return string(pathRunes)
 }
