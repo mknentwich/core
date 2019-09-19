@@ -1,10 +1,11 @@
-package rest
+package pdf
 
 import (
 	"errors"
 	"fmt"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
+	"github.com/mknentwich/core/rest"
 	"net/http"
 	"os"
 	"reflect"
@@ -75,18 +76,18 @@ func insertTestData() {
 		Street:       "Kalscheurener Straße",
 		StreetNumber: "89",
 	}
-	InsertNewAddress(address)
+	rest.InsertNewAddress(address)
 	category := database.Category{
 		Name: "Polka",
 	}
-	InsertNewCategory(category)
+	rest.InsertNewCategory(category)
 	score := database.Score{
 		CategoryID: 1,
 		Difficulty: 3,
 		Price:      39.9,
 		Title:      "Eine letzte Runde (Blasorchesterfassung)",
 	}
-	InsertNewScore(score)
+	rest.InsertNewScore(score)
 	order := database.Order{
 		BillingAddressID:  1,
 		Company:           "Millionen",
@@ -102,7 +103,7 @@ func insertTestData() {
 		Telephone:         "",
 		ReferenceCount:    2019091202,
 	}
-	InsertNewOrder(order)
+	rest.InsertNewOrder(order)
 }
 
 //Inserts TestData to the Database
@@ -114,18 +115,18 @@ func insertTestData2() {
 		Street:       "Spengergasse",
 		StreetNumber: "20",
 	}
-	InsertNewAddress(address)
+	rest.InsertNewAddress(address)
 	category := database.Category{
 		Name: "Polka",
 	}
-	InsertNewCategory(category)
+	rest.InsertNewCategory(category)
 	score := database.Score{
 		CategoryID: 1,
 		Difficulty: 1,
 		Price:      24.37,
 		Title:      "Über den (Netzwerk)Brücken (Wiener Linien Fassung)",
 	}
-	InsertNewScore(score)
+	rest.InsertNewScore(score)
 	order := database.Order{
 		BillingAddressID:  1,
 		Company:           "",
@@ -141,5 +142,5 @@ func insertTestData2() {
 		Telephone:         "",
 		ReferenceCount:    2019091203,
 	}
-	InsertNewOrder(order)
+	rest.InsertNewOrder(order)
 }
