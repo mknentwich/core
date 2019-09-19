@@ -16,6 +16,7 @@ func Serve(logger context.Log) (context.ServiceResult, error) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", utils.HttpImplement(log))
 	mux.HandleFunc("/categories", utils.Rest(get(QueryCategoriesWithChildrenAndScores)))
+	mux.HandleFunc("/scores", utils.Rest(get(QueryScoresFlat)))
 	return context.ServiceResult{HttpHandler: mux}, nil
 }
 
