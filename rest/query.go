@@ -10,10 +10,10 @@ type DataQuery func() interface{}
 func QueryCategoriesWithChildrenAndScores() interface{} {
 	categories := make([]database.Category, 0)
 	database.Receive().Preload("Children", func(d *gorm.DB) *gorm.DB {
-		return d.Joins("inner join scores s on categories.id = s.category_id").Order("name").Preload("Scores", func(d2 *gorm.DB) *gorm.DB {
+		return d.Order("name").Preload("Scores", func(d2 *gorm.DB) *gorm.DB {
 			return d2.Order("title")
 		})
-	}).Where("categories.parent_id is null").Joins("inner join categories c on c.parent_id = categories.id").Joins("inner join scores s on s.category_id = c.id").Order("name").Find(&categories)
+	}).Where("categories.parent_id is null").Order("name").Find(&categories)
 	return categories
 }
 
@@ -36,7 +36,7 @@ type PDFOrderResult struct {
 
 func QueryOrderFromIdForPDF(id int) PDFOrderResult {
 	var pdfOrderResult PDFOrderResult
-	database.Receive().Table("orders").Select("addresses.city, addresses.post_code, addresses.state, addresses.street, addresses.street_number, "+
+	database.Receive().Table("orders").Select("addresses.city, addresses.post_code, addresses.state, addresses.street, addresses.street_number, " +
 		"orders.id, orders.company, orders.date, orders.first_name, orders.last_name, orders.salutation, orders.score_amount, scores.title, scores.price").Joins("inner join addresses on orders.billing_address_id = addresses.id").
 		Joins("inner join scores on orders.score_id = scores.id").Where("orders.id = ?", id).Find(&pdfOrderResult).Scan(&pdfOrderResult)
 	return pdfOrderResult
@@ -64,4 +64,15 @@ func InsertNewScore(score database.Score) error {
 func InsertNewOrder(order database.Order) error {
 	err := database.Receive().Create(&order).Error
 	return err
+}
+
+//Queries all scores without a tree structure.
+func QueryScoresFlat() interface{} {
+	scores := make([]database.Score, 0)
+	database.Receive().Find(&scores)
+	mp := make(map[uint]database.Score)
+	for _, score := range scores {
+		mp[score.ID] = score
+	}
+	return mp
 }
