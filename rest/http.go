@@ -34,6 +34,15 @@ func get(query DataQuery) http.HandlerFunc {
 	}
 }
 
+//calls handler only, if requests header param is equal.
+func flag(key string, value string, handler http.HandlerFunc) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		if r.Header.Get(key) == value {
+			handler(rw, r)
+		}
+	}
+}
+
 //handles http handlers in a sequence.
 func multi(handlers ...http.HandlerFunc) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
