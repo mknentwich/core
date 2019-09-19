@@ -33,3 +33,12 @@ func get(query DataQuery) http.HandlerFunc {
 		}
 	}
 }
+
+//handles http handlers in a sequence.
+func multi(handlers ...http.HandlerFunc) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		for _, handler := range handlers {
+			handler(rw, r)
+		}
+	}
+}
