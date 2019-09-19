@@ -72,7 +72,7 @@ func insertTestData() {
 	address := database.Address{
 		City:         "Hürth",
 		PostCode:     "50354",
-		State:        "DEUTSCHLAND",
+		State:        "Deutschland",
 		Street:       "Kalscheurener Straße",
 		StreetNumber: "89",
 	}
@@ -90,7 +90,7 @@ func insertTestData() {
 	rest.SaveScore(score)
 	order := database.Order{
 		BillingAddressID:  1,
-		Company:           "Millionen",
+		Company:           "Millionen Show",
 		Date:              1568024628000,
 		DeliveryAddressID: 1,
 		Email:             "jauch@werwirdswohl.de",
@@ -111,7 +111,7 @@ func insertTestData2() {
 	address := database.Address{
 		City:         "Wien",
 		PostCode:     "1050",
-		State:        "ÖSTERREICH",
+		State:        "Österreich",
 		Street:       "Spengergasse",
 		StreetNumber: "20",
 	}

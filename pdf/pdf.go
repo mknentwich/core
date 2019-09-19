@@ -39,6 +39,9 @@ type bankData struct {
 	reference  string
 }
 
+//Contains the bill information from database call
+var billData OrderResultPDF
+
 //Info of the Company/Person
 const sentenceTransfer = "Ich bitte Sie, den Betrag binnen 14 Tagen an das folgende Konto zu überweisen:"
 const sentenceNoTaxes = "Dieser Betrag enthält keine Umsatzsteuer aufgrund §6(2)27 Kleinunternehmerregelung."
@@ -73,7 +76,8 @@ func initOwnAddress() *ownAddress {
 	}
 }
 
-func initializePdfGeneration() error {
+func InitializePdfGeneration(orderId int) error {
+	billData = QueryOrderFromIdForPDF(orderId)
 	var address = initOwnAddress()
 	var bank = initBankData()
 	err := createBillPdf(*address, *bank)
@@ -151,18 +155,26 @@ func createBillPdf(address ownAddress, bank bankData) error {
 
 //Paint the billing loadBillingAddress. All Static, just relevant for Spacing the document
 func loadBillingAddress(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
+	var zHd string
 	pdf.SetFontSize(sizeText)
 	pdf.SetX(marginSide)
 	pdf.SetY(marginCustomerAddress)
-	pdf.Cell(cellWidthMax, sizeText, "Salutation / [Company]")
+	if len(billData.Company) > 0 {
+		zHd = "z.Hd. "
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.Company))
+	} else {
+		if len(billData.Salutation) > 0 {
+			pdf.Cell(cellWidthMax, sizeText, translator(billData.Salutation))
+		}
+	}
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, "[z.Hd.] FirstName + LastName")
+	pdf.Cell(cellWidthMax, sizeText, translator(zHd+billData.FirstName+" "+billData.LastName))
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, "BillingAddress 1")
+	pdf.Cell(cellWidthMax, sizeText, translator(billData.Street+" "+billData.StreetNumber))
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, "BillingAddress 2")
+	pdf.Cell(cellWidthMax, sizeText, translator(billData.PostCode+" "+billData.City))
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, "STATE [if not austria]")
+	pdf.Cell(cellWidthMax, sizeText, translator(billData.State))
 	return pdf
 }
 

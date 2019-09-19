@@ -4,7 +4,8 @@ import "testing"
 
 //Tests the generation of the bill pdf
 func TestFPDF(t *testing.T) {
-	err := initializePdfGeneration()
+	insertTestData()
+	err := InitializePdfGeneration(1)
 	if err != nil {
 		t.Errorf("Error on creating the bill pdf: %s", err.Error())
 	}
