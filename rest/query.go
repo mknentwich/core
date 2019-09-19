@@ -17,26 +17,26 @@ func QueryCategoriesWithChildrenAndScores() interface{} {
 	return categories
 }
 
-//Inserts new address to the database
-func InsertNewAddress(address database.Address) error {
-	err := database.Receive().Create(&address).Error
+//Inserts or updates a address to the database
+func SaveAddress(address database.Address) error {
+	err := database.Receive().Save(&address).Error
 	return err
 }
 
-//Inserts new category to the database
-func InsertNewCategory(category database.Category) error {
-	err := database.Receive().Create(&category).Error
+//Inserts or updates a category to the database
+func SaveCategory(category database.Category) error {
+	err := database.Receive().Save(&category).Error
 	return err
 }
 
-//Inserts new score to the database
-func InsertNewScore(score database.Score) error {
-	err := database.Receive().Create(&score).Error
+//Inserts or updates a score to the database
+func SaveScore(score database.Score) error {
+	err := database.Receive().Save(&score).Error
 	return err
 }
 
-//Inserts new order to the database
-func InsertNewOrder(order database.Order) error {
-	err := database.Receive().Create(&order).Error
+//Inserts or updates a order to the database
+func SaveOrder(order database.Order) error {
+	err := database.Receive().Save(&order).Error
 	return err
 }

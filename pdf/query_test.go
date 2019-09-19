@@ -76,18 +76,18 @@ func insertTestData() {
 		Street:       "Kalscheurener Straße",
 		StreetNumber: "89",
 	}
-	rest.InsertNewAddress(address)
+	rest.SaveAddress(address)
 	category := database.Category{
 		Name: "Polka",
 	}
-	rest.InsertNewCategory(category)
+	rest.SaveCategory(category)
 	score := database.Score{
 		CategoryID: 1,
 		Difficulty: 3,
 		Price:      39.9,
 		Title:      "Eine letzte Runde (Blasorchesterfassung)",
 	}
-	rest.InsertNewScore(score)
+	rest.SaveScore(score)
 	order := database.Order{
 		BillingAddressID:  1,
 		Company:           "Millionen",
@@ -103,7 +103,7 @@ func insertTestData() {
 		Telephone:         "",
 		ReferenceCount:    2019091202,
 	}
-	rest.InsertNewOrder(order)
+	rest.SaveOrder(order)
 }
 
 //Inserts TestData to the Database
@@ -115,18 +115,18 @@ func insertTestData2() {
 		Street:       "Spengergasse",
 		StreetNumber: "20",
 	}
-	rest.InsertNewAddress(address)
+	rest.SaveAddress(address)
 	category := database.Category{
 		Name: "Polka",
 	}
-	rest.InsertNewCategory(category)
+	rest.SaveCategory(category)
 	score := database.Score{
 		CategoryID: 1,
 		Difficulty: 1,
 		Price:      24.37,
 		Title:      "Über den (Netzwerk)Brücken (Wiener Linien Fassung)",
 	}
-	rest.InsertNewScore(score)
+	rest.SaveScore(score)
 	order := database.Order{
 		BillingAddressID:  1,
 		Company:           "",
@@ -142,5 +142,5 @@ func insertTestData2() {
 		Telephone:         "",
 		ReferenceCount:    2019091203,
 	}
-	rest.InsertNewOrder(order)
+	rest.SaveOrder(order)
 }
