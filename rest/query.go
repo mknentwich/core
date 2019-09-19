@@ -36,7 +36,7 @@ type PDFOrderResult struct {
 
 func QueryOrderFromIdForPDF(id int) PDFOrderResult {
 	var pdfOrderResult PDFOrderResult
-	database.Receive().Table("orders").Select("addresses.city, addresses.post_code, addresses.state, addresses.street, addresses.street_number, " +
+	database.Receive().Table("orders").Select("addresses.city, addresses.post_code, addresses.state, addresses.street, addresses.street_number, "+
 		"orders.id, orders.company, orders.date, orders.first_name, orders.last_name, orders.salutation, orders.score_amount, scores.title, scores.price").Joins("inner join addresses on orders.billing_address_id = addresses.id").
 		Joins("inner join scores on orders.score_id = scores.id").Where("orders.id = ?", id).Find(&pdfOrderResult).Scan(&pdfOrderResult)
 	return pdfOrderResult
@@ -73,6 +73,17 @@ func QueryScoresFlat() interface{} {
 	mp := make(map[uint]database.Score)
 	for _, score := range scores {
 		mp[score.ID] = score
+	}
+	return mp
+}
+
+//Queries all categories without a tree structure.
+func QueryCategoriesFlat() interface{} {
+	categories := make([]database.Category, 0)
+	database.Receive().Find(&categories)
+	mp := make(map[uint]database.Category)
+	for _, category := range categories {
+		mp[category.ID] = category
 	}
 	return mp
 }
