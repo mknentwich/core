@@ -99,7 +99,7 @@ func insertTestData() {
 		Payed:             false,
 		Salutation:        "Herr",
 		ScoreID:           1,
-		ScoreAmount:       1,
+		ScoreAmount:       3,
 		Telephone:         "",
 		ReferenceCount:    2019091202,
 	}

@@ -1,6 +1,7 @@
 package pdf
 
 import (
+	"fmt"
 	"github.com/skip2/go-qrcode"
 )
 
@@ -28,7 +29,7 @@ func initializeQrDataFields(bank bankData) *qrDataFields {
 		bic:            bank.bic,
 		receiver:       "Markus Nentwich",
 		iban:           bank.iban,
-		amountCurrency: "EUR0.01",
+		amountCurrency: "EUR" + fmt.Sprintf("%.2f", bank.price),
 		purpose:        "",
 		reference:      bank.reference,
 		text:           "",
