@@ -2,6 +2,7 @@ package pdf
 
 import "github.com/mknentwich/core/database"
 
+//Contains data from database for better handling
 type OrderResultPDF struct {
 	City           string
 	PostCode       string

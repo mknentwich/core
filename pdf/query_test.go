@@ -28,6 +28,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+//Tests, if the result from the database has the same values as the local object
 func TestPDFOrderResult(t *testing.T) {
 	insertTestData()
 	result := QueryOrderFromIdForPDF(1)

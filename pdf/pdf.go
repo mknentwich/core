@@ -23,6 +23,7 @@ const (
 	marginNoTaxes         = marginBankData + 40
 )
 
+//Struct for contact details from the company
 type ownAddress struct {
 	name    string
 	street  string
@@ -58,6 +59,7 @@ var err error
 var translator func(string) string
 var cellWidthMax float64
 
+//Initializes the bankdata struct
 func initBankData() *bankData {
 	return &bankData{
 		iban:       "AT403209200000258475",
@@ -68,6 +70,7 @@ func initBankData() *bankData {
 	}
 }
 
+//Initializes the ownAddress struct with static values
 func initOwnAddress() *ownAddress {
 	return &ownAddress{
 		name:    "Markus Nentwich",
@@ -79,6 +82,7 @@ func initOwnAddress() *ownAddress {
 	}
 }
 
+//Generates pdf bill from given orderId
 func InitializePdfGeneration(orderId int) error {
 	billData = QueryOrderFromIdForPDF(orderId)
 	var address = initOwnAddress()
@@ -142,15 +146,14 @@ func createBillPdf(address ownAddress, bank bankData) error {
 	pdf.SetFontStyle("")
 	pdf.SetX(marginSide)
 	pdf.CellFormat(cellWidthMax, sizeText, "Wien, am "+time.Now().Format("02.01.2006"), "", 1, "RT", false, 0, "")
-	//Paint articles to PDF, returns price from all articles with delivery costs
+	//Paint articles
 	bank.price = loadArticles(pdf)
-	//Load bank data
+	//Paint bank data
 	loadBankData(bank, pdf)
-	//Load no Taxes and Signature
+	//Load no taxes sentence
 	pdf.SetX(marginSide)
 	pdf.SetY(marginNoTaxes)
 	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceNoTaxes), "", 0, "", false, 0, "")
-
 	err := pdf.OutputFileAndClose("example_bill.pdf")
 	return err
 }
@@ -180,9 +183,8 @@ func loadBillingAddress(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 	return pdf
 }
 
-//Paint Articles. All Static, just relevant for Spacing the document
+//Paint articles to the pdf, returns total price
 func loadArticles(pdf *gofpdf.Fpdf) float64 {
-	//Header
 	pdf.SetX(marginSide)
 	pdf.SetY(marginArticles)
 	pdf.SetFontStyle("b")
@@ -190,7 +192,6 @@ func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	pdf.CellFormat(cellWidthMax/9*5, sizeText, "Beschreibung", "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "Einzelpreis", "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "Gesamtpreis", "B", 1, "R", false, 0, "")
-	//Body
 	price := float64(billData.ScoreAmount) * billData.Price
 	pdf.SetFontStyle("")
 	pdf.CellFormat(cellWidthMax/9, sizeText, translator(fmt.Sprint(billData.ScoreAmount)), "", 0, "", false, 0, "")
@@ -212,7 +213,7 @@ func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	return price
 }
 
-//TODO: Implement database table for delivery costs
+//TODO: Implement database table for delivery costs to create dynamic values for each country
 func checkDeliveryCosts() float64 {
 	var price float64
 	switch strings.ToLower(billData.State) {
@@ -246,6 +247,7 @@ func loadBankData(bank bankData, pdf *gofpdf.Fpdf) {
 	paintQRCode(generateQrCode(bank), pdf)
 }
 
+//Paint generated qr code to bill
 func paintQRCode(bitmap [][]bool, pdf *gofpdf.Fpdf) {
 	var qrScale = 0.5
 	for rows := range bitmap {
