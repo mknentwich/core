@@ -97,8 +97,13 @@ func findTemplate(templateName string) (tmpl *template.Template, ending string, 
 			fileName = file.Name()
 		}
 	}
+	tmpl, err = template.New(fileName).Funcs(template.FuncMap{
+		"sanitize": utils.SanitizePath}).ParseFiles(path.Join(tmplDir, fileName))
 	ending = fileName[strings.Index(fileName, "."):strings.LastIndex(fileName, ".")]
-	tmpl, err = template.ParseFiles(path.Join(tmplDir, fileName))
+	if tmpl != nil {
+		tmpl = tmpl.Funcs(template.FuncMap{
+			"sanitize": utils.SanitizePath})
+	}
 	return
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
 	"github.com/mknentwich/core/rest"
+	"github.com/mknentwich/core/template"
 	"net/http"
 	"testing"
 )
@@ -60,14 +61,17 @@ func InsertTestData() {
 
 func TestLive(t *testing.T) {
 	conf := context.Configuration{
+		GeneratedDirectory:   "gen",
+		Authentication:       false,
 		Host:                 "127.0.0.1:9400",
 		JWTExpirationMinutes: 4,
 		JWTSecret:            "9ef9486cf0a0e0ed17c2daa34a1e35f7",
 		SQLiteFile:           ":memory:"}
 	services := map[string]context.Serve{
-		"db":   database.Serve,
-		"api":  rest.Serve,
-		"auth": auth.Serve}
+		"db":       database.Serve,
+		"api":      rest.Serve,
+		"auth":     auth.Serve,
+		"template": template.Serve}
 	err := make(chan error)
 	go func() {
 		err <- context.InitializeCustomConfig(services, &conf)
