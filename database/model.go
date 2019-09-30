@@ -42,6 +42,7 @@ type Order struct {
 	LastName          string  `json:"lastName"`
 	Payed             bool    `json:"payed"`
 	ReferenceCount    int     `json:"referenceCount"`
+	BillingDate       int     `json:"date"`
 	Salutation        string  `json:"salutation"`
 	Score             Score   `json:"score"`
 	ScoreID           uint    `sql:"type:integer REFERENCES scores(id)" json:"scoreId"`
