@@ -3,6 +3,7 @@ package pdf
 import (
 	"fmt"
 	"github.com/jung-kurt/gofpdf"
+	"io"
 	"strings"
 	"time"
 )
@@ -22,6 +23,8 @@ const (
 	marginQrCodeSide      = marginSide + 110
 	marginNoTaxes         = marginBankData + 40
 )
+
+type write func(w io.Writer) error
 
 //Struct for contact details from the company
 type ownAddress struct {
@@ -45,13 +48,14 @@ type bankData struct {
 
 //Contains the bill information from database call
 var billData OrderResultPDF
+var billNumber string
 
 //Info of the Company/Person
 const sentenceTransfer = "Ich bitte Sie, den Betrag binnen 14 Tagen an das folgende Konto zu überweisen:"
 const sentenceNoTaxes = "Dieser Betrag enthält keine Umsatzsteuer aufgrund §6(2)27 Kleinunternehmerregelung."
 
 //Name of the used logo [svg file]
-const svgEigenverlag = "nentwich.svg"
+const svgEigenverlag = "pdf/nentwich.svg"
 
 //Variables for svg handling and document print
 var sig gofpdf.SVGBasicType
@@ -66,7 +70,7 @@ func initBankData() *bankData {
 		ibanPretty: "AT40 3209 2000 0025 8475",
 		bic:        "RLNWATWWGAE",
 		institute:  "RAIFFEISEN-REGIONALBANK",
-		reference:  "[referenceCount]",
+		reference:  billNumber,
 	}
 }
 
@@ -83,20 +87,23 @@ func initOwnAddress() *ownAddress {
 }
 
 //Generates pdf bill from given orderId
-func InitializePdfGeneration(orderId int) error {
-	billData = QueryOrderFromIdForPDF(orderId)
+func writeBill(orderId int) (write, error) {
+	billData, err = QueryOrderFromIdForPDF(orderId)
+	if err != nil {
+		return nil, err
+	}
+	billNumber = fmt.Sprint(billData.BillingDate) + fmt.Sprintf("%02d", billData.ReferenceCount)
 	var address = initOwnAddress()
 	var bank = initBankData()
-	err := createBillPdf(*address, *bank)
-	return err
+	return createBillPdf(*address, *bank), nil
 }
 
 //Creates the bill of an order as a pdf
-func createBillPdf(address ownAddress, bank bankData) error {
+func createBillPdf(address ownAddress, bank bankData) write {
 	//Metadata and adding Page
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetFont("Arial", "", sizeText)
-	pdf.SetTitle("RechnungsNr_[referenceCount]", true)
+	pdf.SetTitle("RechnungsNr_"+billNumber, true)
 	pdf.SetAuthor("Nentwich Eigenverlag", true)
 	pdf.AddPage()
 	pdf.SetMargins(marginSide, marginTop, marginSide)
@@ -141,7 +148,7 @@ func createBillPdf(address ownAddress, bank bankData) error {
 	pdf.SetY(marginTitle)
 	pdf.SetFontSize(sizeTitle)
 	pdf.SetFontStyle("b")
-	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator("[referenceCount]"), "", 0, "B", false, 0, "")
+	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator(billNumber), "", 0, "B", false, 0, "")
 	pdf.SetFontSize(sizeText)
 	pdf.SetFontStyle("")
 	pdf.SetX(marginSide)
@@ -154,8 +161,7 @@ func createBillPdf(address ownAddress, bank bankData) error {
 	pdf.SetX(marginSide)
 	pdf.SetY(marginNoTaxes)
 	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceNoTaxes), "", 0, "", false, 0, "")
-	err := pdf.OutputFileAndClose("example_bill.pdf")
-	return err
+	return pdf.Output
 }
 
 //Paint the billing loadBillingAddress. All Static, just relevant for Spacing the document

@@ -5,6 +5,7 @@ import (
 	"github.com/mknentwich/core/auth"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
+	"github.com/mknentwich/core/pdf"
 	"github.com/mknentwich/core/rest"
 	"github.com/mknentwich/core/template"
 	"net/http"
@@ -54,8 +55,43 @@ func InsertTestData() {
 					Title: "Gute Nacht",
 					Price: 33}},
 		}}
+	adr := database.Address{
+		City:         "Hürth",
+		PostCode:     "50354",
+		State:        "Deutschland",
+		Street:       "Kalscheurener Straße",
+		StreetNumber: "89",
+	}
+	orders := []database.Order{
+		{
+			BillingAddress:  adr,
+			Company:         "Millionen Show",
+			Date:            1568024628,
+			DeliveryAddress: adr,
+			Email:           "jauch@werwirdswohl.de",
+			FirstName:       "Günter",
+			LastName:        "Jauch",
+			Payed:           false,
+			ReferenceCount:  2,
+			BillingDate:     1568024628,
+			Salutation:      "Herr",
+			Score: database.Score{
+				Difficulty: 3,
+				Price:      39.9,
+				Title:      "Eine letzte Runde (Blasorchesterfassung)",
+				Category: &database.Category{
+					Name: "Polka",
+				},
+			},
+			ScoreAmount: 3,
+			Telephone:   "",
+		},
+	}
+	for _, v := range orders {
+		rest.SaveOrder(v)
+	}
 	for _, category := range categories {
-		rest.InsertNewCategory(category)
+		rest.SaveCategory(category)
 	}
 }
 
@@ -71,7 +107,8 @@ func TestLive(t *testing.T) {
 		"db":       database.Serve,
 		"api":      rest.Serve,
 		"auth":     auth.Serve,
-		"template": template.Serve}
+		"template": template.Serve,
+		"pdf":      pdf.Serve}
 	err := make(chan error)
 	go func() {
 		err <- context.InitializeCustomConfig(services, &conf)

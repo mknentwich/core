@@ -2,7 +2,6 @@ package pdf
 
 import (
 	"errors"
-	"fmt"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
 	"github.com/mknentwich/core/rest"
@@ -31,7 +30,11 @@ func TestMain(m *testing.M) {
 //Tests, if the result from the database has the same values as the local object
 func TestPDFOrderResult(t *testing.T) {
 	insertTestData()
-	result := QueryOrderFromIdForPDF(1)
+	result, err := QueryOrderFromIdForPDF(1)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	//TODO: get results from database
 	expectedResult := OrderResultPDF{
 		City:           "Hürth",
 		PostCode:       "50354",
@@ -47,24 +50,11 @@ func TestPDFOrderResult(t *testing.T) {
 		ScoreAmount:    3,
 		Title:          "Eine letzte Runde (Blasorchesterfassung)",
 		Price:          39.9,
-		ReferenceCount: 2019091202,
+		ReferenceCount: 2,
+		BillingDate:    20190930,
 	}
 	if reflect.DeepEqual(result, expectedResult) == false {
 		t.Errorf("%s", "Object from the database and local Object aren't the same!")
-	}
-}
-
-//Tests, if the highest referenceCount was found
-func TestFindMaxReferenceCount(t *testing.T) {
-	insertTestData()
-	max := FindMaxReferenceCount()
-	if max != 2019091202 {
-		t.Errorf("%s", "ReferenceCount should be 2019091202, but was "+fmt.Sprint(max))
-	}
-	insertTestData2()
-	max = FindMaxReferenceCount()
-	if max != 2019091203 {
-		t.Errorf("%s", "ReferenceCount should be 2019091203, but was "+fmt.Sprint(max))
 	}
 }
 
@@ -102,7 +92,8 @@ func insertTestData() {
 		ScoreID:           1,
 		ScoreAmount:       3,
 		Telephone:         "",
-		ReferenceCount:    2019091202,
+		ReferenceCount:    2,
+		BillingDate:       20190930,
 	}
 	rest.SaveOrder(order)
 }
