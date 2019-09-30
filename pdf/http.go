@@ -14,8 +14,8 @@ import (
 var log context.Log
 
 //Serve function for this package.
-func Serve(logger context.Log) (context.ServiceResult, error) {
-	log = logger
+func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
+	log = args.Log
 	mux := http.NewServeMux()
 	//TODO wrap order with `Auth`
 	mux.HandleFunc("/order/", auth.Auth(pdfHeader(httpOrder)))

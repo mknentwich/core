@@ -10,10 +10,10 @@ type DataQuery func() interface{}
 func QueryCategoriesWithChildrenAndScores() interface{} {
 	categories := make([]database.Category, 0)
 	database.Receive().Preload("Children", func(d *gorm.DB) *gorm.DB {
-		return d.Joins("inner join scores s on categories.id = s.category_id").Order("name").Preload("Scores", func(d2 *gorm.DB) *gorm.DB {
+		return d.Order("name").Preload("Scores", func(d2 *gorm.DB) *gorm.DB {
 			return d2.Order("title")
 		})
-	}).Where("categories.parent_id is null").Joins("inner join categories c on c.parent_id = categories.id").Joins("inner join scores s on s.category_id = c.id").Order("name").Find(&categories)
+	}).Where("categories.parent_id is null").Order("name").Find(&categories)
 	return categories
 }
 
@@ -39,4 +39,26 @@ func SaveScore(score database.Score) error {
 func SaveOrder(order database.Order) error {
 	err := database.Receive().Save(&order).Error
 	return err
+}
+
+//Queries all scores without a tree structure.
+func QueryScoresFlat() interface{} {
+	scores := make([]database.Score, 0)
+	database.Receive().Find(&scores)
+	mp := make(map[uint]database.Score)
+	for _, score := range scores {
+		mp[score.ID] = score
+	}
+	return mp
+}
+
+//Queries all categories without a tree structure.
+func QueryCategoriesFlat() interface{} {
+	categories := make([]database.Category, 0)
+	database.Receive().Find(&categories)
+	mp := make(map[uint]database.Category)
+	for _, category := range categories {
+		mp[category.ID] = category
+	}
+	return mp
 }
