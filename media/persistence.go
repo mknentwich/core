@@ -27,3 +27,13 @@ func saveMediaToDisk(scoreId int, mediaType string, reader io.Reader) error {
 	_, err = io.Copy(file, reader)
 	return err
 }
+
+func readMediaFromDiskTo(scoreId int, mediaType string, writer io.Writer) error {
+	resPath := path.Join(outDir, mediaType, strconv.Itoa(scoreId))
+	file, err := os.Open(resPath)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(writer, file)
+	return err
+}
