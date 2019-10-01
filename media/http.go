@@ -65,6 +65,7 @@ func mediaDelete(scoreId int, mediaType string) http.HandlerFunc {
 
 func mediaGet(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, rr *http.Request) {
+		contentType(mediaType, rw)
 		utils.HttpImplement(log)
 	}
 }
@@ -79,4 +80,15 @@ func mediaPut(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, rr *http.Request) {
 		utils.HttpImplement(log)
 	}
+}
+
+func contentType(mediaType string, rw http.ResponseWriter) string {
+	ct := ""
+	switch mediaType {
+	case pdf:
+		ct = "application/pdf"
+	case audio:
+		ct = "audio/mpeg"
+	}
+	return ct
 }
