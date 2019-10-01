@@ -11,17 +11,23 @@ import (
 
 var log context.Log
 
+var outDir string
+
 const (
 	audio = "audio"
 	pdf   = "pdf"
 )
 
+var mediaTypes = []string{audio, pdf}
+
 func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	log = args.Log
+	outDir = args.GeneratedDirectory
+	err := createDirs()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/score/", httpScore)
 	return context.ServiceResult{
-		HttpHandler: mux}, nil
+		HttpHandler: mux}, err
 }
 
 func httpScore(rw http.ResponseWriter, r *http.Request) {
