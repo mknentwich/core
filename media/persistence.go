@@ -1,8 +1,10 @@
 package media
 
 import (
+	"io"
 	"os"
 	"path"
+	"strconv"
 )
 
 func createDirs() error {
@@ -13,5 +15,15 @@ func createDirs() error {
 			return err
 		}
 	}
+	return err
+}
+
+func saveMediaToDisk(scoreId int, mediaType string, reader io.Reader) error {
+	resPath := path.Join(outDir, mediaType, strconv.Itoa(scoreId))
+	file, err := os.OpenFile(resPath, os.O_CREATE|os.O_RDWR, 0600)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(file, reader)
 	return err
 }
