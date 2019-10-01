@@ -5,6 +5,7 @@ import (
 	"github.com/mknentwich/core/auth"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
+	"github.com/mknentwich/core/media"
 	"github.com/mknentwich/core/rest"
 	"github.com/mknentwich/core/template"
 	"net/http"
@@ -71,6 +72,7 @@ func TestLive(t *testing.T) {
 		"db":       database.Serve,
 		"api":      rest.Serve,
 		"auth":     auth.Serve,
+		"media":    media.Serve,
 		"template": template.Serve}
 	err := make(chan error)
 	go func() {

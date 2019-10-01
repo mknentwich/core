@@ -16,12 +16,12 @@ const (
 	pdf   = "pdf"
 )
 
-func Serve(args context.ServiceArguments) context.ServiceResult {
+func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	log = args.Log
 	mux := http.NewServeMux()
 	mux.HandleFunc("/score/", httpScore)
 	return context.ServiceResult{
-		HttpHandler: mux}
+		HttpHandler: mux}, nil
 }
 
 func httpScore(rw http.ResponseWriter, r *http.Request) {
