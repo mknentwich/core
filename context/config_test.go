@@ -10,10 +10,8 @@ import (
 //Removes config file before and after every test case.
 func TestMain(m *testing.M) {
 	os.Remove(configFile)
-	os.Remove(customConfigFile)
 	code := m.Run()
 	os.Remove(configFile)
-	os.Remove(customConfigFile)
 	os.Exit(code)
 }
 

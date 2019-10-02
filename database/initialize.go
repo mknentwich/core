@@ -28,7 +28,7 @@ func Receive() *gorm.DB {
 }
 
 //Serve call for the service registry
-func Serve(logger context.Log) (context.ServiceResult, error) {
-	log = logger
+func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
+	log = args.Log
 	return context.ServiceResult{}, initializeDb()
 }
