@@ -59,6 +59,10 @@ func httpScore(rw http.ResponseWriter, r *http.Request) {
 
 func mediaDelete(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, rr *http.Request) {
+		if !scoreExist(scoreId) {
+			rw.WriteHeader(http.StatusNotFound)
+			return
+		}
 		utils.HttpImplement(log)
 	}
 }
@@ -66,6 +70,10 @@ func mediaDelete(scoreId int, mediaType string) http.HandlerFunc {
 func mediaGet(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, rr *http.Request) {
 		contentType(mediaType, rw)
+		if !scoreExist(scoreId) {
+			rw.WriteHeader(http.StatusNotFound)
+			return
+		}
 		utils.HttpImplement(log)
 	}
 }
@@ -78,6 +86,10 @@ func mediaPost(scoreId int, mediaType string) http.HandlerFunc {
 
 func mediaPut(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, rr *http.Request) {
+		if !scoreExist(scoreId) {
+			rw.WriteHeader(http.StatusNotFound)
+			return
+		}
 		utils.HttpImplement(log)
 	}
 }
