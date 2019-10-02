@@ -42,7 +42,7 @@ func readMediaFromDiskTo(scoreId int, mediaType string, writer io.Writer) error 
 }
 
 //removes a media from the filesystem
-func removeMedia(scoreId int, mediaType string, writer io.Writer) error {
+func removeMedia(scoreId int, mediaType string) error {
 	resPath := path.Join(outDir, mediaType, strconv.Itoa(scoreId))
 	return os.Remove(resPath)
 }

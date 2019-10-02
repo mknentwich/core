@@ -69,7 +69,7 @@ func mediaDelete(scoreId int, mediaType string) http.HandlerFunc {
 			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
-		writeInternalError(removeMedia(scoreId, mediaType, rw), rw)
+		writeInternalError(removeMedia(scoreId, mediaType), rw)
 	}
 }
 
@@ -113,4 +113,11 @@ func contentType(mediaType string, rw http.ResponseWriter) {
 		ct = "audio/mpeg"
 	}
 	rw.Header().Set("Content-Type", ct)
+}
+
+func writeInternalError(err error, rw http.ResponseWriter) {
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		log(context.LOG_ERROR, "%s", err.Error())
+	}
 }
