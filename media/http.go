@@ -3,7 +3,6 @@ package media
 import (
 	"github.com/mknentwich/core/auth"
 	"github.com/mknentwich/core/context"
-	"github.com/mknentwich/core/utils"
 	"net/http"
 	"strconv"
 	"strings"
@@ -58,12 +57,12 @@ func httpScore(rw http.ResponseWriter, r *http.Request) {
 }
 
 func mediaDelete(scoreId int, mediaType string) http.HandlerFunc {
-	return func(rw http.ResponseWriter, rr *http.Request) {
+	return func(rw http.ResponseWriter, r *http.Request) {
 		if !scoreExist(scoreId) {
 			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
-		utils.HttpImplement(log)
+		writeInternalError(removeMedia(scoreId, mediaType, rw), rw)
 	}
 }
 

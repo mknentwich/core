@@ -37,3 +37,8 @@ func readMediaFromDiskTo(scoreId int, mediaType string, writer io.Writer) error 
 	_, err = io.Copy(writer, file)
 	return err
 }
+
+func removeMedia(scoreId int, mediaType string, writer io.Writer) error {
+	resPath := path.Join(outDir, mediaType, strconv.Itoa(scoreId))
+	return os.Remove(resPath)
+}
