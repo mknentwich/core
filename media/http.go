@@ -65,7 +65,7 @@ func httpScore(rw http.ResponseWriter, r *http.Request) {
 //returns a http handler which deletes a media from the filesystem
 func mediaDelete(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		if !scoreExist(scoreId) {
+		if !scoreExist(scoreId, mediaType) {
 			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -77,7 +77,7 @@ func mediaDelete(scoreId int, mediaType string) http.HandlerFunc {
 func mediaGet(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, rr *http.Request) {
 		contentType(mediaType, rw)
-		if !scoreExist(scoreId) {
+		if !scoreExist(scoreId, mediaType) {
 			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -95,7 +95,7 @@ func mediaPost(scoreId int, mediaType string) http.HandlerFunc {
 //returns a http handler which reads the media from the body and stores it (only for overriding)
 func mediaPut(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		if !scoreExist(scoreId) {
+		if !scoreExist(scoreId, mediaType) {
 			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
