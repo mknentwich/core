@@ -8,17 +8,22 @@ import (
 	"strings"
 )
 
+//log function for this package
 var log context.Log
 
+//directory where all media will be stored
 var outDir string
 
+//media types
 const (
 	audio = "audio"
 	pdf   = "pdf"
 )
 
+//slice of media types
 var mediaTypes = []string{audio, pdf}
 
+//instantiates this package
 func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	log = args.Log
 	outDir = args.GeneratedDirectory
@@ -29,6 +34,7 @@ func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 		HttpHandler: mux}, err
 }
 
+//root handler for scores
 func httpScore(rw http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	parts := strings.Split(path, "/")
@@ -56,6 +62,7 @@ func httpScore(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//returns a http handler which deletes a media from the filesystem
 func mediaDelete(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		if !scoreExist(scoreId) {
@@ -66,6 +73,7 @@ func mediaDelete(scoreId int, mediaType string) http.HandlerFunc {
 	}
 }
 
+//returns a http handler which reads a media from the filesystem and returns it in the body
 func mediaGet(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, rr *http.Request) {
 		contentType(mediaType, rw)
@@ -77,12 +85,14 @@ func mediaGet(scoreId int, mediaType string) http.HandlerFunc {
 	}
 }
 
+//returns a http handler which reads the media from the body and stores it (only for creation)
 func mediaPost(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		writeInternalError(saveMediaToDisk(scoreId, mediaType, r.Body), rw)
 	}
 }
 
+//returns a http handler which reads the media from the body and stores it (only for overriding)
 func mediaPut(scoreId int, mediaType string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		if !scoreExist(scoreId) {
@@ -93,6 +103,7 @@ func mediaPut(scoreId int, mediaType string) http.HandlerFunc {
 	}
 }
 
+//sets the correct Content-Type to the response
 func contentType(mediaType string, rw http.ResponseWriter) {
 	ct := ""
 	switch mediaType {
