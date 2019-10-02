@@ -74,23 +74,23 @@ func mediaGet(scoreId int, mediaType string) http.HandlerFunc {
 			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
-		utils.HttpImplement(log)
+		writeInternalError(readMediaFromDiskTo(scoreId, mediaType, rw), rw)
 	}
 }
 
 func mediaPost(scoreId int, mediaType string) http.HandlerFunc {
-	return func(rw http.ResponseWriter, rr *http.Request) {
-		utils.HttpImplement(log)
+	return func(rw http.ResponseWriter, r *http.Request) {
+		writeInternalError(saveMediaToDisk(scoreId, mediaType, r.Body), rw)
 	}
 }
 
 func mediaPut(scoreId int, mediaType string) http.HandlerFunc {
-	return func(rw http.ResponseWriter, rr *http.Request) {
+	return func(rw http.ResponseWriter, r *http.Request) {
 		if !scoreExist(scoreId) {
 			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
-		utils.HttpImplement(log)
+		writeInternalError(saveMediaToDisk(scoreId, mediaType, r.Body), rw)
 	}
 }
 
