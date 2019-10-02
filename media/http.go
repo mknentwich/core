@@ -94,7 +94,7 @@ func mediaPut(scoreId int, mediaType string) http.HandlerFunc {
 	}
 }
 
-func contentType(mediaType string, rw http.ResponseWriter) string {
+func contentType(mediaType string, rw http.ResponseWriter) {
 	ct := ""
 	switch mediaType {
 	case pdf:
@@ -102,5 +102,5 @@ func contentType(mediaType string, rw http.ResponseWriter) string {
 	case audio:
 		ct = "audio/mpeg"
 	}
-	return ct
+	rw.Header().Set("Content-Type", ct)
 }
