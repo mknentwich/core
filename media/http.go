@@ -53,6 +53,8 @@ func httpScore(rw http.ResponseWriter, r *http.Request) {
 		auth.Auth(mediaDelete(scoreId, mediaType))(rw, r)
 	case http.MethodGet:
 		mediaGet(scoreId, mediaType)(rw, r)
+	case http.MethodHead:
+		mediaSum(scoreId, mediaType)(rw, r)
 	case http.MethodPost:
 		auth.Auth(mediaPost(scoreId, mediaType))(rw, r)
 	case http.MethodPut:
@@ -100,6 +102,18 @@ func mediaPut(scoreId int, mediaType string) http.HandlerFunc {
 			return
 		}
 		writeInternalError(saveMediaToDisk(scoreId, mediaType, r.Body), rw)
+	}
+}
+
+func mediaSum(scoreId int, mediaType string) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		if !scoreExist(scoreId, mediaType) {
+			rw.WriteHeader(http.StatusNotFound)
+			return
+		}
+		hash, err := readSumFromDisk(scoreId, mediaType)
+		rw.Header().Set("Content-MD5", hash)
+		writeInternalError(err, rw)
 	}
 }
 

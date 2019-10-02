@@ -1,6 +1,8 @@
 package media
 
 import (
+	"crypto/md5"
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -39,6 +41,22 @@ func readMediaFromDiskTo(scoreId int, mediaType string, writer io.Writer) error 
 	}
 	_, err = io.Copy(writer, file)
 	return err
+}
+
+//creates a md5sum from the filesystem
+func readSumFromDisk(scoreId int, mediaType string) (string, error) {
+	resPath := path.Join(outDir, mediaType, strconv.Itoa(scoreId))
+	file, err := os.Open(resPath)
+	if err != nil {
+		return "", err
+	}
+	md := md5.New()
+	_, err = io.Copy(md, file)
+	if err != nil {
+		return "", err
+	}
+	checksum := md.Sum(nil)
+	return fmt.Sprintf("%x", checksum), nil
 }
 
 //removes a media from the filesystem

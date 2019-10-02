@@ -42,5 +42,7 @@ To override an existing audio, send a `PUT` to `{audio-url}` with the same param
 To get an audio simply do an `GET` request to `{audio-url}`.
 It returns the audio in its body.
 
-TIP: You can `GET` on `{audio-url}{md5}` to only return the md5sum of the audio in the body.
-This can be used to either check if an audio exists or, if the audio is the same as you have locally.
+==== Head
+
+To retrieve the md5 hash of a media, do an `HEAD` request to `{audio-url}`.
+The hash will be in the `Content-MD5` header field.
