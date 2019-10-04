@@ -44,7 +44,7 @@ func TestMain(m *testing.M) {
 		time.Sleep(1 * time.Second)
 		_, err = c.Do(r)
 	}
-	insertUser(&albertUser, albert.Password)
+	saveUser(&albertUser)
 	code := m.Run()
 	os.Exit(code)
 }
@@ -147,3 +147,13 @@ func TestUserInfo(t *testing.T) {
 	checkHttpStatus(http.StatusOK, status, t)
 	checkUserInfo(albert, user, t)
 }
+
+func TestUserInsert(t *testing.T) {}
+
+func TestUserUpdateWithoutPassword(t *testing.T) {}
+
+func TestUserUpdatePassword(t *testing.T) {}
+
+func TestAdminUpdateUser(t *testing.T) {}
+
+func TestUserUpdateAnother(t *testing.T) {}

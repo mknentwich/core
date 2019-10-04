@@ -10,19 +10,16 @@ func queryUserByEmail(email string) *database.User {
 	return &user
 }
 
-func insertUser(user *database.User, password string) error {
-	credentials := &Credentials{Email: user.Email, Password: password}
+func saveUser(user *database.User) error {
 	database.Receive().Save(user)
-	return updatePassword(credentials)
-}
-
-func updatePassword(credentials *Credentials) error {
-	password, err := hashPassword(credentials.Password)
-	if err != nil {
-		return err
+	if user.Password != "" {
+		password, err := hashPassword(user.Password)
+		if err != nil {
+			return err
+		}
+		user := queryUserByEmail(user.Email)
+		user.Password = password
+		database.Receive().Save(user)
 	}
-	user := queryUserByEmail(credentials.Email)
-	user.Password = password
-	database.Receive().Save(user)
 	return nil
 }

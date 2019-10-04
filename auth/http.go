@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/mknentwich/core/context"
+	"github.com/mknentwich/core/database"
 	"net/http"
 	"strings"
 )
@@ -16,6 +17,7 @@ func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	log = args.Log
 	mux := http.NewServeMux()
 	mux.HandleFunc("/login", httpLogin)
+	mux.HandleFunc("/password", httpPassword)
 	mux.HandleFunc("/refresh", httpRefresh)
 	mux.HandleFunc("/self", httpSelf)
 	return context.ServiceResult{HttpHandler: mux}, nil
@@ -40,6 +42,34 @@ func httpLogin(rw http.ResponseWriter, r *http.Request) {
 	}
 	_, err = rw.Write([]byte(jwt))
 	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
+func httpPassword(rw http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	requester, _, err := Check(getJwt(r))
+	if err != nil {
+		rw.WriteHeader(http.StatusForbidden)
+		return
+	}
+	decoder := json.NewDecoder(r.Body)
+	user := database.User{}
+	err = decoder.Decode(&user)
+	if err != nil {
+		rw.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	if user.Email != requester.Email && requester.Admin {
+		rw.WriteHeader(http.StatusForbidden)
+		return
+	}
+	err = saveUser(&user)
+	if err != nil {
+		log(context.LOG_ERROR, "error occured while creating/updating user: %s", err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)
 	}
 }
