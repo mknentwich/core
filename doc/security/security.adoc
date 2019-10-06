@@ -59,3 +59,5 @@ TIP: This request is also recommended to check if a JWT is valid
 In order to change a password, one has to request a `POST` on `auth/password` with a <<loginBody, login body>>.
 
 NOTE: Only admins are allowed to change other users password.
+
+TIP: In order to create the first user, one may disable authentication in the config, insert a user and re-enable it.
