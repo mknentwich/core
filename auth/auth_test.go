@@ -178,8 +178,6 @@ func TestUserInfo(t *testing.T) {
 	checkUserInfo(albert, user, t)
 }
 
-func TestUserInsert(t *testing.T) {}
-
 func TestUserUpdateWithoutPassword(t *testing.T) {
 	albertName := "alberti"
 	token, ok := jwt(albert)
