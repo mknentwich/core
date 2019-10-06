@@ -14,7 +14,11 @@ import (
 	"time"
 )
 
-var albertUser = database.User{Email: "albert@diealberts.at", Password: "desisagaunzgeheimespwd", Name: "Albert Albert", Admin: true}
+var albertUserWOP = database.UserWithoutPassword{Email: "albert@diealberts.at", Name: "Albert Albert", Admin: true}
+var albertUser = database.User{
+	UserWithoutPassword: &albertUserWOP,
+	Password:            "desisagaunzgeheimespwd",
+}
 var albert = Credentials{Email: albertUser.Email, Password: albertUser.Password}
 var config = context.Configuration{
 	Authentication:       true,
@@ -44,7 +48,7 @@ func TestMain(m *testing.M) {
 		time.Sleep(1 * time.Second)
 		_, err = c.Do(r)
 	}
-	saveUser(&albertUser)
+	SaveUser(&albertUser)
 	code := m.Run()
 	os.Exit(code)
 }
@@ -112,6 +116,32 @@ func userInfo(jwt string, t *testing.T) (database.User, int) {
 	return user, response.StatusCode
 }
 
+func jwt(credentials Credentials) (string, bool) {
+	data, _ := json.Marshal(credentials)
+	request, err := http.NewRequest(http.MethodPost, canonical("/login"), bytes.NewBuffer(data))
+	if err != nil {
+		panic(err.Error())
+	}
+	header(request)
+	response, _ := http.DefaultClient.Do(request)
+	jwt, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err.Error())
+	}
+	return string(jwt), response.StatusCode == http.StatusOK
+}
+
+func changePassword(issuerJwt string, user database.User) {
+	data, _ := json.Marshal(user)
+	request, err := http.NewRequest(http.MethodPost, canonical("/password"), bytes.NewBuffer(data))
+	request.Header.Set("Authorization", "Bearer "+issuerJwt)
+	if err != nil {
+		panic(err.Error())
+	}
+	header(request)
+	http.DefaultClient.Do(request)
+}
+
 //Tests a wrong Password on `/testLogin`
 func TestInvalidCredentials(t *testing.T) {
 	cr := albert
@@ -150,10 +180,87 @@ func TestUserInfo(t *testing.T) {
 
 func TestUserInsert(t *testing.T) {}
 
-func TestUserUpdateWithoutPassword(t *testing.T) {}
+func TestUserUpdateWithoutPassword(t *testing.T) {
+	albertName := "alberti"
+	token, ok := jwt(albert)
+	if !ok {
+		panic("albert can't login")
+	}
+	nalbert := albertUser
+	nalbert.Name = albertName
+	nalbert.Password = ""
+	changePassword(token, nalbert)
+	changedAlbert := queryUserByEmail(nalbert.Email)
+	if changedAlbert.Name != nalbert.Name {
+		t.Errorf("albert's name should be %s but was %s", nalbert.Name, changedAlbert.Name)
+	}
+	if _, ok = jwt(albert); !ok {
+		t.Errorf("albert cannot login anymore")
+	}
+	SaveUser(&albertUser)
+}
 
-func TestUserUpdatePassword(t *testing.T) {}
+func TestUserUpdatePassword(t *testing.T) {
+	helgaWOP := database.UserWithoutPassword{
+		Name:  "Helga",
+		Email: "helga@gmx.at",
+		Admin: false,
+	}
+	helga := database.User{
+		UserWithoutPassword: &helgaWOP,
+		Password:            "123456",
+	}
+	SaveUser(&helga)
+	token, ok := jwt(Credentials{Email: helga.Email, Password: string(helga.Password)})
+	if !ok {
+		panic("helga cannot login")
+	}
+	helga.Password = "ibimsdehelga"
+	changePassword(token, helga)
+	if _, ok := jwt(Credentials{Email: helga.Email, Password: string(helga.Password)}); !ok {
+		t.Errorf("helga cannot login with her new password")
+	}
+}
 
-func TestAdminUpdateUser(t *testing.T) {}
+func TestAdminUpdateUser(t *testing.T) {
+	williWOP := database.UserWithoutPassword{
+		Name:  "Willi",
+		Email: "willi@gmx.at",
+		Admin: false}
+	willi := database.User{
+		UserWithoutPassword: &williWOP,
+		Password:            "123456",
+	}
+	SaveUser(&willi)
+	token, ok := jwt(albert)
+	if !ok {
+		panic("albert cannot login")
+	}
+	willi.Password = "ibimsdwilli"
+	changePassword(token, willi)
+	if _, ok := jwt(Credentials{Email: willi.Email, Password: string(willi.Password)}); !ok {
+		t.Errorf("willi cannot login with his new password")
+	}
+}
 
-func TestUserUpdateAnother(t *testing.T) {}
+func TestUserUpdateAnother(t *testing.T) {
+	klausWOP := database.UserWithoutPassword{
+		Name:  "Klaus",
+		Email: "klaus@gmx.at",
+		Admin: false}
+	klaus := database.User{
+		UserWithoutPassword: &klausWOP,
+		Password:            "123456",
+	}
+	SaveUser(&klaus)
+	token, ok := jwt(Credentials{Email: klaus.Email, Password: string(klaus.Password)})
+	if !ok {
+		panic("klaus cannot login")
+	}
+	nalbert := albertUser
+	nalbert.Password = "se4vjktmhk"
+	changePassword(token, nalbert)
+	if _, ok := jwt(Credentials{Email: nalbert.Email, Password: string(nalbert.Password)}); ok {
+		t.Errorf("klaus (who is no admin) was able to change another user's password")
+	}
+}

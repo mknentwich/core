@@ -63,11 +63,11 @@ func httpPassword(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
-	if user.Email != requester.Email && requester.Admin {
+	if user.Email != requester.Email && !requester.Admin {
 		rw.WriteHeader(http.StatusForbidden)
 		return
 	}
-	err = saveUser(&user)
+	err = SaveUser(&user)
 	if err != nil {
 		log(context.LOG_ERROR, "error occured while creating/updating user: %s", err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -113,9 +113,10 @@ func httpSelf(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	encoder := json.NewEncoder(rw)
-	err = encoder.Encode(user)
+	err = encoder.Encode(user.UserWithoutPassword)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
+		log(context.LOG_ERROR, "an error occurred in http self: %s", err.Error())
 	}
 }
 

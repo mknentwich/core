@@ -50,11 +50,15 @@ type Order struct {
 }
 
 type User struct {
+	*UserWithoutPassword
+	Password string `json:"password"`
+}
+
+type UserWithoutPassword struct {
 	gorm.Model
 	Email      string `gorm:"primary_key" json:"email"`
 	Admin      bool   `json:"admin"`
 	Name       string `json:"name"`
-	Password   string `json:"-"`
 	LastChange int    `json:"lastChange"`
 	LastLogin  int    `json:"lastLogin"`
 }

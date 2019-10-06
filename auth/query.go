@@ -6,12 +6,19 @@ import (
 
 func queryUserByEmail(email string) *database.User {
 	var user database.User
-	database.Receive().Where(&database.User{Email: email}).Find(&user)
+	err := database.Receive().Where(&database.User{UserWithoutPassword: &database.UserWithoutPassword{Email: email}}).Find(&user).Error
+	if err != nil {
+		return nil
+	}
 	return &user
 }
 
-func saveUser(user *database.User) error {
-	database.Receive().Save(user)
+func SaveUser(user *database.User) error {
+	if us := queryUserByEmail(user.Email); us == nil {
+		database.Receive().Save(user)
+	} else {
+		database.Receive().Model(user).Updates(user)
+	}
 	if user.Password != "" {
 		password, err := hashPassword(user.Password)
 		if err != nil {

@@ -58,6 +58,12 @@ func InsertTestData() {
 	for _, category := range categories {
 		rest.InsertNewCategory(category)
 	}
+	auth.SaveUser(&database.User{
+		Email:    "albert@gmx.at",
+		Admin:    true,
+		Name:     "Albert",
+		Password: "123456",
+	})
 }
 
 func TestLive(t *testing.T) {
