@@ -89,21 +89,21 @@ func initOwnAddress() *ownAddress {
 }
 
 //Generates pdf bill from given orderId
-func writeBill(orderId int) (write, error) {
+func writeBill(orderId int) (write, string, error) {
 	billData, err = QueryOrderFromIdForPDF(orderId)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	err = checkBillNumber(orderId)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	var address = initOwnAddress()
 	var bank = initBankData()
-	return createBillPdf(*address, *bank), nil
+	return createBillPdf(*address, *bank), "Rechnung_" + billNumber, nil
 }
 
-//Checks if billingdate and referenceCount is already set for this order and sets local billNumber
+//Checks if billingDate and referenceCount is already set for this order and sets local billNumber
 //If not, both gets generated and updated at the database
 func checkBillNumber(orderId int) error {
 	if billData.BillingDate == 0 && billData.ReferenceCount == 0 {
@@ -142,7 +142,7 @@ func createBillPdf(address ownAddress, bank bankData) write {
 	//Metadata and adding Page
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetFont("Arial", "", sizeText)
-	pdf.SetTitle("RechnungsNr_"+billNumber, true)
+	pdf.SetTitle("Rechnung_"+billNumber, true)
 	pdf.SetAuthor("Nentwich Eigenverlag", true)
 	pdf.AddPage()
 	pdf.SetMargins(marginSide, marginTop, marginSide)

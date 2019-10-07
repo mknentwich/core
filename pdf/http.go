@@ -45,10 +45,8 @@ func httpOrder(rw http.ResponseWriter, r *http.Request) {
 
 func httpOrderGet(rw http.ResponseWriter, r *http.Request, orderId int) {
 	log(context.LOG_INFO, "requested order with id: %d", orderId)
-	//TODO define filename and append some infos such as the number of the bill
-	filename := "TestRechnung.pdf"
+	billWriter, filename, err := writeBill(orderId)
 	rw.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
-	billWriter, err := writeBill(orderId)
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
 		log(context.LOG_ERROR, "error while creating bill pdf: %d", err.Error())
