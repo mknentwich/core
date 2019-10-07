@@ -66,14 +66,12 @@ func InsertTestData() {
 		{
 			BillingAddress:  adr,
 			Company:         "Millionen Show",
-			Date:            1568024628,
+			Date:            20191005,
 			DeliveryAddress: adr,
 			Email:           "jauch@werwirdswohl.de",
 			FirstName:       "Günter",
 			LastName:        "Jauch",
 			Payed:           false,
-			ReferenceCount:  2,
-			BillingDate:     1568024628,
 			Salutation:      "Herr",
 			Score: database.Score{
 				Difficulty: 3,
