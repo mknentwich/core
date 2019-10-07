@@ -3,7 +3,9 @@ package pdf
 import (
 	"fmt"
 	"github.com/jung-kurt/gofpdf"
+	"github.com/mknentwich/core/database"
 	"io"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -92,10 +94,47 @@ func writeBill(orderId int) (write, error) {
 	if err != nil {
 		return nil, err
 	}
-	billNumber = fmt.Sprint(billData.BillingDate) + fmt.Sprintf("%02d", billData.ReferenceCount)
+	err = checkBillNumber(orderId)
+	if err != nil {
+		return nil, err
+	}
 	var address = initOwnAddress()
 	var bank = initBankData()
 	return createBillPdf(*address, *bank), nil
+}
+
+//Checks if billingdate and referenceCount is already set for this order and sets local billNumber
+//If not, both gets generated and updated at the database
+func checkBillNumber(orderId int) error {
+	if billData.BillingDate == 0 && billData.ReferenceCount == 0 {
+		time := time.Now()
+		fTime, err := strconv.Atoi(time.Format("20060102"))
+		if err != nil {
+			return err
+		}
+		maxReferenceCount, err := QueryMaxReferenceCountToday(fTime)
+		if err != nil {
+			return err
+		}
+		maxReferenceCount++
+		order := database.Order{
+			BillingDate:    fTime,
+			ReferenceCount: maxReferenceCount,
+		}
+		err = UpdateOrders(orderId, &order)
+		if err != nil {
+			return err
+		}
+		setBillNumber(fTime, maxReferenceCount)
+	} else {
+		setBillNumber(billData.BillingDate, billData.ReferenceCount)
+	}
+	return err
+}
+
+//Sets local billNumber. Contains billingDate & referenceCount
+func setBillNumber(billingDate int, referenceCount int) {
+	billNumber = fmt.Sprint(billingDate) + fmt.Sprintf("%02d", referenceCount)
 }
 
 //Creates the bill of an order as a pdf

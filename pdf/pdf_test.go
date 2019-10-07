@@ -29,10 +29,10 @@ func getExpectedResult() OrderResultPDF {
 		LastName:       order.LastName,
 		Salutation:     order.Salutation,
 		ScoreAmount:    order.ScoreAmount,
+		BillingDate:    order.BillingDate,
+		ReferenceCount: order.ReferenceCount,
 		Title:          score.Title,
 		Price:          score.Price,
-		ReferenceCount: order.ReferenceCount,
-		BillingDate:    order.BillingDate,
 	}
 }
 
@@ -78,6 +78,18 @@ func TestPDF(t *testing.T) {
 			t.Errorf("%s", "Object from the database and local Object aren't the same!")
 		}
 	})
+	t.Run("InsertTestData_3", func(t *testing.T) {
+		insertTestData3()
+		result, err := QueryOrderFromIdForPDF(3)
+		if err != nil {
+			t.Error(err.Error())
+		}
+		expectedResult := getExpectedResult()
+		expectedResult.ID = 3
+		if reflect.DeepEqual(result, expectedResult) == false {
+			t.Errorf("%s", "Object from the database and local Object aren't the same!")
+		}
+	})
 	t.Run("PDFCreationFromTestData", func(t *testing.T) {
 		f, err := os.OpenFile("example-bill-company.pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
@@ -97,6 +109,19 @@ func TestPDF(t *testing.T) {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
 		write, err = writeBill(2)
+		if err != nil {
+			t.Errorf("Error on creating the bill pdf: %s", err.Error())
+			return
+		}
+		err = write(f)
+		if err != nil {
+			t.Errorf("Error on creating the bill pdf: %s", err.Error())
+		}
+		f, err = os.OpenFile("example-bill-existing-refCount.pdf", os.O_RDWR|os.O_CREATE, 0600)
+		if err != nil {
+			t.Errorf("Error on creating the bill pdf: %s", err.Error())
+		}
+		write, err = writeBill(3)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
@@ -142,8 +167,6 @@ func insertTestData() {
 		FirstName:       "Günter",
 		LastName:        "Jauch",
 		Payed:           false,
-		ReferenceCount:  2,
-		BillingDate:     20190930,
 		Salutation:      "Herr",
 		Score:           score,
 		ScoreAmount:     3,
@@ -193,8 +216,52 @@ func insertTestData2() {
 		Score:           score,
 		ScoreAmount:     1,
 		Telephone:       "",
-		ReferenceCount:  3,
-		BillingDate:     20180612,
+	}
+	err = rest.SaveOrder(order)
+	if err != nil {
+		err.Error()
+	}
+}
+
+func insertTestData3() {
+	address = database.Address{
+		City:         "Leopoldsdorf im Marchfelde",
+		PostCode:     "2285",
+		State:        "Österreich",
+		Street:       "Leopold-Figl-Gasse",
+		StreetNumber: "2c",
+	}
+	err := rest.SaveAddress(address)
+	if err != nil {
+		err.Error()
+	}
+	score = database.Score{
+		Category: &database.Category{
+			Name: "Marsch",
+		},
+		Difficulty: 1,
+		Price:      24.37,
+		Title:      "Arnheim Marsch",
+	}
+	err = rest.SaveScore(score)
+	if err != nil {
+		err.Error()
+	}
+	order = database.Order{
+		BillingAddress:  address,
+		Company:         "",
+		Date:            20190201,
+		DeliveryAddress: address,
+		Email:           "e11908080@student.tuwien.ac.at",
+		FirstName:       "Richard",
+		LastName:        "Stëckl",
+		Payed:           true,
+		Salutation:      "Herr",
+		Score:           score,
+		ScoreAmount:     1,
+		Telephone:       "",
+		BillingDate:     20190126,
+		ReferenceCount:  5,
 	}
 	err = rest.SaveOrder(order)
 	if err != nil {
