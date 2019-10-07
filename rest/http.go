@@ -5,6 +5,7 @@ import (
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/utils"
 	"net/http"
+	"strconv"
 )
 
 //Logging function for this package.
@@ -16,6 +17,7 @@ func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", utils.HttpImplement(log))
 	mux.HandleFunc("/categories", utils.Rest(flat(get(QueryCategoriesFlat), get(QueryCategoriesWithChildrenAndScores))))
+	mux.HandleFunc("/order", postOrder)
 	mux.HandleFunc("/scores", utils.Rest(get(QueryScoresFlat)))
 	return context.ServiceResult{HttpHandler: mux}, nil
 }
@@ -42,5 +44,48 @@ func flat(flatHandler http.HandlerFunc, treeHandler http.HandlerFunc) http.Handl
 		} else {
 			treeHandler(rw, r)
 		}
+	}
+}
+
+func postOrder(rw http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	f := r.PostForm
+	addressesEqual, err := strconv.ParseBool(f.Get("addressesEqual"))
+	if err != nil {
+		rw.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	scoreId, err := strconv.ParseUint(f.Get("scoreId"), 10, 64)
+	if err != nil {
+		rw.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	o := PostedOrder{
+		AddressesEqual: addressesEqual,
+		Bcity:          f.Get("bcity"),
+		BpostCode:      f.Get("bpostcode"),
+		Bstate:         f.Get("bstate"),
+		Bstreet:        f.Get("bstreet"),
+		BstreetNumber:  f.Get("bstreetNumber"),
+		City:           f.Get("city"),
+		PostCode:       f.Get("postCode"),
+		ScoreId:        uint(scoreId),
+		State:          f.Get("state"),
+		Street:         f.Get("street"),
+		StreetNumber:   f.Get("streetNumber"),
+		Company:        f.Get("company"),
+		Email:          f.Get("email"),
+		FirstName:      f.Get("firstName"),
+		LastName:       f.Get("lastName"),
+		Salutation:     f.Get("salutation"),
+		Telephone:      f.Get("telephone"),
+	}
+	err = InsertNewOrder(*(&o).Order())
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		log(context.LOG_ERROR, "error occurred while persisting a new order: %s", err.Error())
 	}
 }
