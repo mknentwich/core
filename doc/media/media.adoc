@@ -1,0 +1,48 @@
+:media-url: /media/score
+:md5: ?md5=true
+:suff: /{id}
+:pdf: /pdf
+:audio: /audio
+
+:audio-url: {media-url}{audio}{suff}
+:pdf-url: {media-url}{pdf}{suff}
+
+== Media
+
+All media files will be handled in this chapter.
+Currently, only scores do have media.
+
+=== Score
+
+Scores can be associated with a PDF and a example audio file.
+Both have the same behavior in general so, it will only be explained with audios.
+
+All requests will return an `HTTP NOT FOUND` when no score with the given id exists.
+All requests except `GET` will return an `HTTP NOT ALLOWED` when the user who does the request is not an admin.
+
+NOTE: In order to apply this to PDFs, simply use `{pdf-url}` instead of `{audio-url}`.
+
+==== Post [[post]]
+
+To post a new audio, simply send a `POST` to `{audio-url}` with the audio in the body.
+
+NOTE: If a audio already exist for a score, the server will return a HTTP `CONFLICT`.
+To override it, use `PUT` instead.
+
+==== Delete
+
+To delete a audio, simply send a `DELETE` to `{audio-url}`.
+
+==== Put
+
+To override an existing audio, send a `PUT` to `{audio-url}` with the same parameters as in <<post>>.
+
+==== Get
+
+To get an audio simply do an `GET` request to `{audio-url}`.
+It returns the audio in its body.
+
+==== Head
+
+To retrieve the md5 hash of a media, do an `HEAD` request to `{audio-url}`.
+The hash will be in the `Content-MD5` header field.

@@ -2,16 +2,10 @@ package context
 
 import (
 	"encoding/json"
+	"github.com/mknentwich/core/utils"
 	"os"
 	"testing"
 )
-
-//Fails a test if an unexpected error occur which has nothing to do with the test case.
-func unexpected(t *testing.T, err error) {
-	if err != nil {
-		t.Fatalf("Encountered unexpected error: %s", err.Error())
-	}
-}
 
 //Removes config file before and after every test case.
 func TestMain(m *testing.M) {
@@ -21,7 +15,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-//Tests if a config will we generated when no exists.
+//Tests if a config will be generated when no exists.
 func TestConfigCreation(t *testing.T) {
 	_, err := config()
 	if err != nil {
@@ -33,14 +27,14 @@ func TestConfigCreation(t *testing.T) {
 func TestConfigRead(t *testing.T) {
 	custom := &Configuration{Host: "73.73.73.73:80", JWTExpirationMinutes: 1, SQLiteFile: "db.sqlite"}
 	file, err := os.Create(configFile)
-	unexpected(t, err)
+	utils.Unexpected(t, err)
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(custom)
-	unexpected(t, err)
+	utils.Unexpected(t, err)
 	err = file.Close()
-	unexpected(t, err)
+	utils.Unexpected(t, err)
 	read, err := config()
-	unexpected(t, err)
+	utils.Unexpected(t, err)
 	if read.Host != custom.Host || read.JWTExpirationMinutes != custom.JWTExpirationMinutes || read.SQLiteFile != custom.SQLiteFile {
 		t.Errorf("Expected configuration: %v, but got: %v", *custom, *read)
 	}

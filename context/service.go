@@ -1,9 +1,17 @@
 package context
 
-import "net/http"
+import (
+	"net/http"
+)
 
 //Represents a service instance.
-type Serve func(log Log) ServiceResult
+type Serve func(args ServiceArguments) (ServiceResult, error)
+
+//Arguments to a service.
+type ServiceArguments struct {
+	GeneratedDirectory string
+	Log                Log
+}
 
 //Results of a service.
 type ServiceResult struct {

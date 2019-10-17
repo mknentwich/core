@@ -56,7 +56,7 @@
       "type": "string"
     },
     "payed": {
-      "type": "boolean"
+      "type": "number"
     },
     "referenceCount": {
       "type": "number"
