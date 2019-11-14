@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net/mail"
 	"os"
 )
 
@@ -13,12 +14,22 @@ var Conf Configuration
 
 //Struct for the configuration of the application.
 type Configuration struct {
-	Authentication       bool   `json:"authentication"`
-	GeneratedDirectory   string `json:"generatedDirectory"`
-	Host                 string `json:"host"`
-	JWTExpirationMinutes int    `json:"jwtExpirationMinutes"`
-	JWTSecret            string `json:"jwtSecret"`
-	SQLiteFile           string `json:"sqliteFile"`
+	Authentication       bool             `json:"authentication"`
+	GeneratedDirectory   string           `json:"generatedDirectory"`
+	Host                 string           `json:"host"`
+	JWTExpirationMinutes int              `json:"jwtExpirationMinutes"`
+	JWTSecret            string           `json:"jwtSecret"`
+	SQLiteFile           string           `json:"sqliteFile"`
+	Mail                 EmailCredentials `json:"mail"`
+	OrderRetrievers      []*mail.Address  `json:"orderRetrievers"`
+}
+
+//Struct for SMTP credentials which will be used for sending mails.
+type EmailCredentials struct {
+	Username string        `json:"username"`
+	Password string        `json:"password"`
+	SMTPHost string        `json:"smtpHost"`
+	Address  *mail.Address `json:"address"`
 }
 
 //Returns a default configuration with a generated jwt secret.
