@@ -18,8 +18,25 @@ type MailContent struct {
 	Identity string
 }
 
-func notifyCustomer(order *database.Order) error {
+var customerMailBody template.Template
+var ownerMailBody template.Template
 
+func notify(order *database.Order) error {
+	err := notifyCustomer(order)
+	if err != nil {
+		return err
+	}
+	return notifyOwner(order)
+}
+
+func notifyCustomer(order *database.Order) error {
+	//TODO add data
+	return sendMail(customerMailBody, []*mail.Address{{Name: order.FirstName + " " + order.LastName, Address: order.Email}}, nil)
+}
+
+func notifyOwner(order *database.Order) error {
+	//TODO add data
+	return sendMail(ownerMailBody, context.Conf.OrderRetrievers, nil)
 }
 
 func sendMail(mailBody template.Template, retriever []*mail.Address, data interface{}) error {
