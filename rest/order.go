@@ -34,22 +34,33 @@ func (p *PostedOrder) Order() *database.Order {
 		Street:       p.Street,
 		StreetNumber: p.StreetNumber,
 	}
+	var billingAddress *database.Address
+	if p.AddressesEqual {
+		billingAddress = address
+	} else {
+		billingAddress = &database.Address{
+			City:         p.Bcity,
+			PostCode:     p.BpostCode,
+			State:        p.Bstate,
+			Street:       p.Bstreet,
+			StreetNumber: p.BstreetNumber,
+		}
+	}
 	now := time.Now()
 	order := &database.Order{
-		BillingAddress:   database.Address{},
-		BillingAddressID: 0,
-		Company:          p.Company,
-		Date:             &now,
-		DeliveryAddress:  *address,
-		Email:            p.Email,
-		FirstName:        p.FirstName,
-		LastName:         p.LastName,
-		Payed:            false,
-		ReferenceCount:   0,
-		Salutation:       p.Salutation,
-		ScoreID:          p.ScoreId,
-		ScoreAmount:      0,
-		Telephone:        p.Telephone,
+		BillingAddress:  billingAddress,
+		Company:         p.Company,
+		Date:            &now,
+		DeliveryAddress: address,
+		Email:           p.Email,
+		FirstName:       p.FirstName,
+		LastName:        p.LastName,
+		Payed:           false,
+		ReferenceCount:  0,
+		Salutation:      p.Salutation,
+		ScoreID:         p.ScoreId,
+		ScoreAmount:     1,
+		Telephone:       p.Telephone,
 	}
 	return order
 }

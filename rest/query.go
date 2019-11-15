@@ -71,8 +71,9 @@ func InsertNewScore(score database.Score) error {
 }
 
 //Inserts new order to the database
-func InsertNewOrder(order database.Order) error {
-	err := database.Receive().Create(&order).Error
+func InsertNewOrder(order *database.Order) error {
+	err := database.Receive().Create(order).Error
+	database.Receive().Preload("Score").Find(order)
 	return err
 }
 

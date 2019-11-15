@@ -34,11 +34,11 @@ type Score struct {
 
 type Order struct {
 	gorm.Model
-	BillingAddress    Address    `json:"billingAddress"`
+	BillingAddress    *Address   `json:"billingAddress"`
 	BillingAddressID  uint       `sql:"type:integer REFERENCES addresses(id)" json:"-"`
 	Company           string     `json:"company"`
 	Date              *time.Time `json:"date"`
-	DeliveryAddress   Address    `json:"deliveryAddress"`
+	DeliveryAddress   *Address   `json:"deliveryAddress"`
 	DeliveryAddressID uint       `sql:"type:integer REFERENCES addresses(id)" json:"-"`
 	Email             string     `json:"email"`
 	FirstName         string     `json:"firstName"`

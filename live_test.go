@@ -9,6 +9,7 @@ import (
 	"github.com/mknentwich/core/rest"
 	"github.com/mknentwich/core/template"
 	"net/http"
+	"net/mail"
 	"testing"
 )
 
@@ -74,7 +75,24 @@ func TestLive(t *testing.T) {
 		Host:                 "127.0.0.1:9400",
 		JWTExpirationMinutes: 4,
 		JWTSecret:            "9ef9486cf0a0e0ed17c2daa34a1e35f7",
-		SQLiteFile:           ":memory:"}
+		SQLiteFile:           "baum.db",
+		Mail: context.EmailCredentials{
+			Username: "",
+			Password: "",
+			SMTPHost: "",
+			Address: &mail.Address{
+				Name:    "",
+				Address: "",
+			},
+		},
+		OrderRetrievers: []*mail.Address{
+			{
+				Name:    "",
+				Address: "",
+			},
+			{
+				Name:    "",
+				Address: ""}}}
 	services := map[string]context.Serve{
 		"db":       database.Serve,
 		"api":      rest.Serve,

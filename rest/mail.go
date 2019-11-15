@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/mail"
 	"net/smtp"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -48,17 +49,27 @@ func notify(order *database.Order) error {
 
 func notifyCustomer(order *database.Order) error {
 	customerAddress := &mail.Address{Name: order.FirstName + " " + order.LastName, Address: order.Email}
+	c := context.Conf
 	data := &MailData{
 		Order: order,
 		Date:  time.Now().Format(mailDateFormat),
 		To:    customerAddress.String(),
-		From:  context.Conf.Mail.Address.String()}
+		From:  c.Mail.Address.String()}
 	return sendMail(customerMailBody, []*mail.Address{customerAddress}, data)
 }
 
 func notifyOwner(order *database.Order) error {
-	//TODO add data
-	return sendMail(ownerMailBody, context.Conf.OrderRetrievers, nil)
+	mails := make([]string, len(context.Conf.OrderRetrievers))
+	for i, v := range context.Conf.OrderRetrievers {
+		mails[i] = v.String()
+	}
+	data := &MailData{
+		Order: order,
+		Date:  time.Now().Format(mailDateFormat),
+		To:    strings.Join(mails, ","),
+		From:  context.Conf.Mail.Address.String(),
+	}
+	return sendMail(ownerMailBody, context.Conf.OrderRetrievers, data)
 }
 
 func sendMail(mailBody *template.Template, retriever []*mail.Address, data *MailData) error {
@@ -71,6 +82,7 @@ func sendMail(mailBody *template.Template, retriever []*mail.Address, data *Mail
 	var msg []byte
 	buf := bytes.NewBuffer(msg)
 	err = mailBody.Execute(buf, data)
+	msg = buf.Bytes()
 	if err != nil {
 		return err
 	}
@@ -79,5 +91,6 @@ func sendMail(mailBody *template.Template, retriever []*mail.Address, data *Mail
 	for _, retr := range retriever {
 		to = append(to, retr.Address)
 	}
+	//fmt.Println(string(buf.Bytes()))
 	return smtp.SendMail(mailCfg.SMTPHost, auth, mailCfg.Address.Address, to, msg)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/mknentwich/core/utils"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 //Logging function for this package.
@@ -17,7 +18,7 @@ func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", utils.HttpImplement(log))
 	mux.HandleFunc("/categories", utils.Rest(flat(get(QueryCategoriesFlat), get(QueryCategoriesWithChildrenAndScores))))
-	mux.HandleFunc("/order", postOrder)
+	mux.HandleFunc("/order", utils.Cors(postOrder))
 	mux.HandleFunc("/scores", utils.Rest(get(QueryScoresFlat)))
 	return context.ServiceResult{HttpHandler: mux}, initializeTemplates()
 }
@@ -52,19 +53,19 @@ func postOrder(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	f := r.PostForm
-	addressesEqual, err := strconv.ParseBool(f.Get("addressesEqual"))
+	err := r.ParseForm()
 	if err != nil {
 		rw.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
+	f := r.PostForm
 	scoreId, err := strconv.ParseUint(f.Get("scoreId"), 10, 64)
 	if err != nil {
 		rw.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
 	o := PostedOrder{
-		AddressesEqual: addressesEqual,
+		AddressesEqual: strings.ToLower(f.Get("addressesEqual")) == "on",
 		Bcity:          f.Get("bcity"),
 		BpostCode:      f.Get("bpostcode"),
 		Bstate:         f.Get("bstate"),
@@ -83,9 +84,15 @@ func postOrder(rw http.ResponseWriter, r *http.Request) {
 		Salutation:     f.Get("salutation"),
 		Telephone:      f.Get("telephone"),
 	}
-	err = InsertNewOrder(*(&o).Order())
+	order := (&o).Order()
+	err = InsertNewOrder(order)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		log(context.LOG_ERROR, "error occurred while persisting a new order: %s", err.Error())
+	}
+	err = notify(order)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		log(context.LOG_ERROR, "error occurred while sending order mails: %s", err.Error())
 	}
 }
