@@ -19,7 +19,7 @@ func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	mux.HandleFunc("/categories", utils.Rest(flat(get(QueryCategoriesFlat), get(QueryCategoriesWithChildrenAndScores))))
 	mux.HandleFunc("/order", postOrder)
 	mux.HandleFunc("/scores", utils.Rest(get(QueryScoresFlat)))
-	return context.ServiceResult{HttpHandler: mux}, nil
+	return context.ServiceResult{HttpHandler: mux}, initializeTemplates()
 }
 
 //Encodes a structure as JSON and returns it
@@ -48,7 +48,7 @@ func flat(flatHandler http.HandlerFunc, treeHandler http.HandlerFunc) http.Handl
 }
 
 func postOrder(rw http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}

@@ -59,9 +59,10 @@ func InsertTestData() {
 		rest.InsertNewCategory(category)
 	}
 	auth.SaveUser(&database.User{
-		Email:    "albert@gmx.at",
-		Admin:    true,
-		Name:     "Albert",
+		UserWithoutPassword: &database.UserWithoutPassword{
+			Email: "albert@gmx.at",
+			Admin: true,
+			Name:  "Albert"},
 		Password: "123456",
 	})
 }

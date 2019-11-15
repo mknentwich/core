@@ -4,22 +4,39 @@ import (
 	"bytes"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
+	"github.com/mknentwich/core/utils"
 	"net"
 	"net/mail"
 	"net/smtp"
 	"text/template"
+	"time"
 )
 
-const mailDateFormat = "Mon, 2 Jan 2006 15:04:05 +0700 "
+const (
+	mailDateFormat   = "Mon, 2 Jan 2006 15:04:05 +0700 "
+	customerTemplate = "order-customer.mail.tmpl"
+	ownerTemplate    = "order-owner.mail.tmpl"
+)
 
-type MailContent struct {
-	Order    *database.Order
-	Date     string
-	Identity string
+type MailData struct {
+	Order *database.Order
+	Date  string
+	To    string
+	From  string
 }
 
-var customerMailBody template.Template
-var ownerMailBody template.Template
+var customerMailBody *template.Template
+var ownerMailBody *template.Template
+
+func initializeTemplates() error {
+	var err error
+	ownerMailBody, err = utils.CreateTemplate(ownerTemplate)
+	if err != nil {
+		return err
+	}
+	customerMailBody, err = utils.CreateTemplate(customerTemplate)
+	return err
+}
 
 func notify(order *database.Order) error {
 	err := notifyCustomer(order)
@@ -30,8 +47,13 @@ func notify(order *database.Order) error {
 }
 
 func notifyCustomer(order *database.Order) error {
-	//TODO add data
-	return sendMail(customerMailBody, []*mail.Address{{Name: order.FirstName + " " + order.LastName, Address: order.Email}}, nil)
+	customerAddress := &mail.Address{Name: order.FirstName + " " + order.LastName, Address: order.Email}
+	data := &MailData{
+		Order: order,
+		Date:  time.Now().Format(mailDateFormat),
+		To:    customerAddress.String(),
+		From:  context.Conf.Mail.Address.String()}
+	return sendMail(customerMailBody, []*mail.Address{customerAddress}, data)
 }
 
 func notifyOwner(order *database.Order) error {
@@ -39,7 +61,7 @@ func notifyOwner(order *database.Order) error {
 	return sendMail(ownerMailBody, context.Conf.OrderRetrievers, nil)
 }
 
-func sendMail(mailBody template.Template, retriever []*mail.Address, data interface{}) error {
+func sendMail(mailBody *template.Template, retriever []*mail.Address, data *MailData) error {
 	mailCfg := context.Conf.Mail
 
 	host, _, err := net.SplitHostPort(mailCfg.SMTPHost)
