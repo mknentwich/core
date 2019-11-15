@@ -58,10 +58,10 @@ func InsertTestData() {
 	for _, category := range categories {
 		rest.InsertNewCategory(category)
 	}
-	auth.SaveUser(&database.User{
-		Email:    "albert@gmx.at",
-		Admin:    true,
-		Name:     "Albert",
+	auth.SaveUser(&database.User{UserWithoutPassword: &database.UserWithoutPassword{
+		Email: "albert@gmx.at",
+		Admin: true,
+		Name:  "Albert"},
 		Password: "123456",
 	})
 }
@@ -73,7 +73,7 @@ func TestLive(t *testing.T) {
 		Host:                 "127.0.0.1:9400",
 		JWTExpirationMinutes: 4,
 		JWTSecret:            "9ef9486cf0a0e0ed17c2daa34a1e35f7",
-		SQLiteFile:           ":memory:"}
+		SQLiteFile:           "baum.db"}
 	services := map[string]context.Serve{
 		"db":       database.Serve,
 		"api":      rest.Serve,
