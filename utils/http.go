@@ -18,10 +18,10 @@ func HttpImplement(log context.Log) http.HandlerFunc {
 }
 
 func Rest(handler http.HandlerFunc) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
+	return Cors(func(writer http.ResponseWriter, request *http.Request) {
 		writer.Header().Set("Content-Type", "application/json")
-		Cors(handler)
-	}
+		handler(writer, request)
+	})
 }
 
 func Cors(handler http.HandlerFunc) http.HandlerFunc {
