@@ -18,6 +18,7 @@ func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	outDir = args.GeneratedDirectory
 	mux := http.NewServeMux()
 	mux.HandleFunc("/generate", auth.Admin(httpGenerate))
+	worker()
 	return context.ServiceResult{HttpHandler: mux}, nil
 }
 

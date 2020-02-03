@@ -11,6 +11,7 @@ import (
 	"path"
 	"strings"
 	"text/template"
+	"time"
 )
 
 const (
@@ -28,9 +29,32 @@ func Generate() error {
 	if err != nil {
 		return err
 	}
-	clean(outDir)
+	err = clean(outDir)
+	if err != nil {
+		log(context.LOG_WARNING, "failed to wipe template directory: %s", err.Error())
+	}
 	generateCategories(rest.QueryCategoriesWithChildrenAndScores().([]database.Category), tmpl, scoreTmpl, outDir, ending, scoreEnding)
 	return nil
+}
+
+//creates a worker for the template generator for every n minutes specified in the config
+func worker() {
+	ticker := time.NewTicker(time.Duration(context.Conf.TemplateInterval) * time.Minute)
+	handleScheduleError(Generate())
+	go func() {
+		for range ticker.C {
+			handleScheduleError(Generate())
+		}
+	}()
+}
+
+//handles a schedules error
+func handleScheduleError(err error) {
+	if err != nil {
+		log(context.LOG_ERROR, "failed to generated scheduled templates: %s", err.Error())
+	} else {
+		log(context.LOG_INFO, "successfully generated scheduled templates")
+	}
 }
 
 func clean(dir string) error {
