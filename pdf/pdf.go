@@ -16,6 +16,7 @@ const (
 	sizeText              = 11
 	sizeBankData          = 14
 	sizeTitle             = 18
+	sizeLogo              = 26
 	marginSide            = 25
 	marginTop             = 12.5
 	marginCustomerAddress = 50.8
@@ -56,11 +57,7 @@ var billNumber string
 const sentenceTransfer = "Ich bitte Sie, den Betrag binnen 14 Tagen an das folgende Konto zu überweisen:"
 const sentenceNoTaxes = "Dieser Betrag enthält keine Umsatzsteuer aufgrund §6(2)27 Kleinunternehmerregelung."
 
-//Name of the used logo [svg file]
-const svgEigenverlag = "pdf/nentwich.svg"
-
 //Variables for svg handling and document print
-var sig gofpdf.SVGBasicType
 var err error
 var translator func(string) string
 var cellWidthMax float64
@@ -140,31 +137,22 @@ func setBillNumber(billingDate int, referenceCount int) {
 //Creates the bill of an order as a pdf
 func createBillPdf(address ownAddress, bank bankData) write {
 	//Metadata and adding Page
-	pdf := gofpdf.New("P", "mm", "A4", "")
-	pdf.SetFont("Arial", "", sizeText)
+	pdf := gofpdf.New("P", "mm", "A4", "resource/")
 	pdf.SetTitle("Rechnung_"+billNumber, true)
 	pdf.SetAuthor("Markus Nentwich", true)
+	pdf.AddFont("wiener_melange", "B", "WienerMelange-Bold-new.json")
 	pdf.AddPage()
 	pdf.SetMargins(marginSide, marginTop, marginSide)
 	translator = pdf.UnicodeTranslatorFromDescriptor("")
 	width, _ := pdf.GetPageSize()
 	cellWidthMax = width - 2*marginSide
 	//MN Eigenverlag Image
-	sig, err = gofpdf.SVGBasicFileParse(svgEigenverlag)
-	if err == nil {
-		scale := 250 / sig.Wd
-		scaleY := 75 / sig.Ht
-		if scale > scaleY {
-			scale = scaleY
-		}
-		pdf.SetLineCapStyle("round")
-		pdf.SetLineWidth(0.26458332)
-		pdf.SetXY(marginSide-5, marginTop)
-		pdf.SVGBasicWrite(&sig, scale)
-	} else {
-		pdf.SetError(err)
-	}
+	pdf.SetFont("wiener_melange", "B", sizeLogo)
+	var titleTranslator = pdf.UnicodeTranslatorFromDescriptor("cp1252")
+	pdf.SetX(marginSide)
+	pdf.Cell(cellWidthMax, sizeLogo, titleTranslator("Nentwich Verlag"))
 	//Own Address and Contact Info
+	pdf.SetFont("Helvetica", "", sizeText)
 	pdf.SetX(marginSide)
 	pdf.SetY(marginTop)
 	pdf.SetFontSize(sizeHeader)
