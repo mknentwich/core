@@ -22,6 +22,7 @@ type Configuration struct {
 	SQLiteFile           string           `json:"sqliteFile"`
 	Mail                 EmailCredentials `json:"mail"`
 	OrderRetrievers      []*mail.Address  `json:"orderRetrievers"`
+	TemplateInterval     uint             `json:"templateInterval"`
 }
 
 //Struct for SMTP credentials which will be used for sending mails.
