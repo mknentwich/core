@@ -14,16 +14,16 @@ import (
 const (
 	sizeHeader            = 10
 	sizeText              = 11
+	sizeBankData          = 14
 	sizeTitle             = 18
 	marginSide            = 25
 	marginTop             = 12.5
 	marginCustomerAddress = 50.8
 	marginTitle           = marginCustomerAddress + 40
 	marginArticles        = marginTitle + 25
-	marginBankData        = marginArticles + 80
-	marginQrCode          = marginBankData + 10
-	marginQrCodeSide      = marginSide + 110
-	marginNoTaxes         = marginBankData + 40
+	marginBankData        = marginArticles + 88
+	marginQrCode          = marginBankData + 20
+	marginQrCodeSide      = marginSide + 135
 )
 
 type write func(w io.Writer) error
@@ -84,7 +84,7 @@ func initOwnAddress() *ownAddress {
 		city:    "A-1020 Wien",
 		phone:   "Telefon: +43699 / 10329882",
 		email:   "E-Mail: nentwich94@gmx.at",
-		website: "Webseite: ",
+		website: "Webseite: markus-nentwich.at",
 	}
 }
 
@@ -143,7 +143,7 @@ func createBillPdf(address ownAddress, bank bankData) write {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetFont("Arial", "", sizeText)
 	pdf.SetTitle("Rechnung_"+billNumber, true)
-	pdf.SetAuthor("Nentwich Eigenverlag", true)
+	pdf.SetAuthor("Markus Nentwich", true)
 	pdf.AddPage()
 	pdf.SetMargins(marginSide, marginTop, marginSide)
 	translator = pdf.UnicodeTranslatorFromDescriptor("")
@@ -159,7 +159,6 @@ func createBillPdf(address ownAddress, bank bankData) write {
 		}
 		pdf.SetLineCapStyle("round")
 		pdf.SetLineWidth(0.26458332)
-		pdf.SetDrawColor(238, 73, 87)
 		pdf.SetXY(marginSide-5, marginTop)
 		pdf.SVGBasicWrite(&sig, scale)
 	} else {
@@ -196,10 +195,6 @@ func createBillPdf(address ownAddress, bank bankData) write {
 	bank.price = loadArticles(pdf)
 	//Paint bank data
 	loadBankData(bank, pdf)
-	//Load no taxes sentence
-	pdf.SetX(marginSide)
-	pdf.SetY(marginNoTaxes)
-	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceNoTaxes), "", 0, "", false, 0, "")
 	return pdf.Output
 }
 
@@ -255,6 +250,8 @@ func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "Summe", "", 0, "R", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", price)+" €"), "", 1, "R", false, 0, "")
 	pdf.SetFontStyle("")
+	//Load no taxes sentence
+	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceNoTaxes), "", 0, "C", false, 0, "")
 	return price
 }
 
@@ -275,21 +272,27 @@ func loadBankData(bank bankData, pdf *gofpdf.Fpdf) {
 	pdf.SetX(marginSide)
 	pdf.SetY(marginBankData)
 	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceTransfer), "", 1, "", false, 0, "")
-	pdf.Cell(cellWidthMax/4, sizeText, "IBAN:")
-	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.ibanPretty))
-	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax/4, sizeText, "BIC:")
-	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.bic))
-	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax/4, sizeText, "Geldinstitut:")
-	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.institute))
-	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax/4, sizeText, "Zahlungsreferenz:")
+	pdf.Ln(sizeText / 1.5)
+	pdf.SetFontSize(sizeBankData)
+	pdf.Cell(cellWidthMax/3, sizeText, "IBAN:")
+	pdf.Cell(cellWidthMax/3, sizeText, translator(bank.ibanPretty))
+	pdf.Ln(sizeText / 1.5)
+	pdf.Cell(cellWidthMax/3, sizeText, "BIC:")
+	pdf.Cell(cellWidthMax/3, sizeText, translator(bank.bic))
+	pdf.Ln(sizeText / 1.5)
+	pdf.Cell(cellWidthMax/3, sizeText, "Geldinstitut:")
+	pdf.Cell(cellWidthMax/3, sizeText, translator(bank.institute))
+	pdf.Ln(sizeText / 1.5)
 	pdf.SetFontStyle("b")
-	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.reference))
-	pdf.SetFontStyle("")
-	pdf.Ln(sizeText / 2)
+	pdf.Cell(cellWidthMax/3, sizeText, "Zahlungsreferenz:")
+	pdf.Cell(cellWidthMax/3, sizeText, translator(bank.reference))
+	pdf.Ln(sizeText * 1.5)
 	paintQRCode(generateQrCode(bank), pdf)
+	pdf.SetFontSize(sizeText)
+	pdf.CellFormat(cellWidthMax, sizeText, translator("Im Feld Zahlungsreferenz unbedingt obige Nummer anführen,"), "", 0, "C", false, 0, "")
+	pdf.Ln(sizeText / 2)
+	pdf.CellFormat(cellWidthMax, sizeText, translator("ansonsten kann die Zahlung nicht zugeordnet werden!"), "", 0, "C", false, 0, "")
+	pdf.SetFontStyle("")
 }
 
 //Paint generated qr code to bill
