@@ -6,15 +6,17 @@ import (
 	"github.com/mknentwich/core/media"
 	"github.com/mknentwich/core/pdf"
 	"github.com/mknentwich/core/rest"
+	"github.com/mknentwich/core/template"
 	"log"
 )
 
 //A map for all services which exist in that project.
 var services = map[string]context.Serve{
-	"api":   rest.Serve,
-	"db":    database.Serve,
-	"media": media.Serve,
-	"pdf":   pdf.Serve}
+	"api":      rest.Serve,
+	"db":       database.Serve,
+	"media":    media.Serve,
+	"pdf":      pdf.Serve,
+	"template": template.Serve}
 
 //Calls the context to initialize everything.
 func Serve() {
