@@ -16,11 +16,39 @@ var log context.Log
 func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	log = args.Log
 	mux := http.NewServeMux()
+	mux.HandleFunc("/admin", Admin(httpAdmin))
 	mux.HandleFunc("/login", httpLogin)
 	mux.HandleFunc("/password", httpPassword)
 	mux.HandleFunc("/refresh", httpRefresh)
 	mux.HandleFunc("/self", httpSelf)
 	return context.ServiceResult{HttpHandler: mux}, nil
+}
+
+type AdminUser struct {
+	Email string `json:"email"`
+	Admin bool   `json:"admin"`
+}
+
+func httpAdmin(rw http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	admin := AdminUser{}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&admin)
+	if err != nil {
+		rw.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	user := queryUserByEmail(admin.Email)
+	user.Admin = admin.Admin
+	user.Password = ""
+	err = SaveUser(user)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		log(context.LOG_ERROR, "failed to update admin status: %s", err.Error())
+	}
 }
 
 func httpLogin(rw http.ResponseWriter, r *http.Request) {
