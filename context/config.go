@@ -38,7 +38,7 @@ func defaultConf() *Configuration {
 	secret := make([]byte, 16)
 	rand.Read(secret)
 	return &Configuration{
-		Authentication:     true,
+		Authentication:     false,
 		GeneratedDirectory: "gen",
 		Host:               "0.0.0.0:9400",
 		Mail: EmailCredentials{
