@@ -81,7 +81,6 @@ func config() (*Configuration, error) {
 	decoder := json.NewDecoder(conf)
 	configuration := &Configuration{}
 	err = decoder.Decode(configuration)
-	return configuration, err
 	if err != nil {
 		return configuration, err
 	}
