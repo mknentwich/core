@@ -16,7 +16,7 @@ RUN go install -ldflags '-s -w' ./cmd/core
 
 FROM alpine
 COPY --from=build /go/bin/core /core
-WORKDIR /core-data
-VOLUME  /core-data
+WORKDIR /data
+VOLUME  /data
 EXPOSE  9400
 ENTRYPOINT [ "/core" ]
