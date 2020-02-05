@@ -13,9 +13,9 @@ import (
 
 //A map for all services which exist in that project.
 var services = map[string]context.Serve{
+	"db":       database.Serve,
 	"api":      rest.Serve,
 	"dav":      dav.Serve,
-	"db":       database.Serve,
 	"media":    media.Serve,
 	"pdf":      pdf.Serve,
 	"template": template.Serve}
