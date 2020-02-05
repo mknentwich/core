@@ -44,6 +44,12 @@ func QueryOrderFromIdForPDF(id int) OrderResultPDF {
 	return pdfOrderResult
 }
 
+func QueryOrders(payed bool) []database.Order {
+	orders := make([]database.Order, 0)
+	database.Receive().Where("payed = ?", payed).Find(&orders)
+	return orders
+}
+
 //Finds the highest referenceCount value from the orders table
 func FindMaxReferenceCount() int {
 	var max int
