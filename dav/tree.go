@@ -12,6 +12,7 @@ import (
 var tree PhantomNode
 
 type PhantomNode interface {
+	Children() []PhantomNode
 	File() webdav.File
 	Name() string
 	Subset(string) PhantomNode
@@ -22,6 +23,10 @@ type PhantomNode interface {
 type BasicNode struct {
 	children []PhantomNode
 	name     string
+}
+
+func (b *BasicNode) Children() []PhantomNode {
+	return b.children
 }
 
 func (b *BasicNode) File() webdav.File {
