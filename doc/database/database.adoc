@@ -42,7 +42,8 @@ entity "orders" as ord {
   *first_name : text <<nn>>
   *last_name :  text <<nn>>
   *payed : datetime
-  *reference_count : text <<nn, uq>>
+  *billing_date : datetime
+  *reference_count : integer <<nn, uq>>
   *salutation : text
   *score_amount : integer <<nn>>
   *<color:green>score_id : integer <<nn>></color>

@@ -2,7 +2,6 @@ package database
 
 import (
 	"github.com/jinzhu/gorm"
-	"time"
 )
 
 type Address struct {
@@ -34,22 +33,23 @@ type Score struct {
 
 type Order struct {
 	gorm.Model
-	BillingAddress    *Address   `json:"billingAddress"`
-	BillingAddressID  uint       `sql:"type:integer REFERENCES addresses(id)" json:"-"`
-	Company           string     `json:"company"`
-	Date              *time.Time `json:"date"`
-	DeliveryAddress   *Address   `json:"deliveryAddress"`
-	DeliveryAddressID uint       `sql:"type:integer REFERENCES addresses(id)" json:"-"`
-	Email             string     `json:"email"`
-	FirstName         string     `json:"firstName"`
-	LastName          string     `json:"lastName"`
-	Payed             bool       `json:"payed"`
-	ReferenceCount    int        `json:"referenceCount"`
-	Salutation        string     `json:"salutation"`
-	Score             Score      `json:"score"`
-	ScoreID           uint       `sql:"type:integer REFERENCES scores(id)" json:"scoreId"`
-	ScoreAmount       int        `json:"scoreAmount"`
-	Telephone         string     `json:"telephone"`
+	BillingAddress    *Address `json:"billingAddress"`
+	BillingAddressID  uint     `sql:"type:integer REFERENCES addresses(id)" json:"-"`
+	BillingDate       int64    `json:"billingDate"`
+	Company           string   `json:"company"`
+	Date              int64    `json:"date"`
+	DeliveryAddress   *Address `json:"deliveryAddress"`
+	DeliveryAddressID uint     `sql:"type:integer REFERENCES addresses(id)" json:"-"`
+	Email             string   `json:"email"`
+	FirstName         string   `json:"firstName"`
+	LastName          string   `json:"lastName"`
+	Payed             bool     `json:"payed"`
+	ReferenceCount    int      `json:"referenceCount"`
+	Salutation        string   `json:"salutation"`
+	Score             Score    `json:"score"`
+	ScoreID           uint     `sql:"type:integer REFERENCES scores(id)" json:"scoreId"`
+	ScoreAmount       int      `json:"scoreAmount"`
+	Telephone         string   `json:"telephone"`
 }
 
 type User struct {

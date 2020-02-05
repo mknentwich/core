@@ -5,12 +5,15 @@ import (
 	"github.com/mknentwich/core/auth"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
+	"github.com/mknentwich/core/dav"
 	"github.com/mknentwich/core/media"
+	"github.com/mknentwich/core/pdf"
 	"github.com/mknentwich/core/rest"
 	"github.com/mknentwich/core/template"
 	"net/http"
 	"net/mail"
 	"testing"
+	"time"
 )
 
 func InsertTestData() {
@@ -56,8 +59,42 @@ func InsertTestData() {
 					Title: "Gute Nacht",
 					Price: 33}},
 		}}
+	adr := database.Address{
+		City:         "Hürth",
+		PostCode:     "50354",
+		State:        "Deutschland",
+		Street:       "Kalscheurener Straße",
+		StreetNumber: "89",
+	}
+	t, _ := time.Parse(time.RFC822, "01 Jan 15 10:00 UTC")
+	orders := []database.Order{
+		{
+			BillingAddress:  &adr,
+			Company:         "Millionen Show",
+			Date:            &t,
+			DeliveryAddress: &adr,
+			Email:           "jauch@werwirdswohl.de",
+			FirstName:       "Günter",
+			LastName:        "Jauch",
+			Payed:           false,
+			Salutation:      "Herr",
+			Score: database.Score{
+				Difficulty: 3,
+				Price:      39.9,
+				Title:      "Eine letzte Runde (Blasorchesterfassung)",
+				Category: &database.Category{
+					Name: "Polka",
+				},
+			},
+			ScoreAmount: 3,
+			Telephone:   "",
+		},
+	}
+	for _, v := range orders {
+		rest.SaveOrder(v)
+	}
 	for _, category := range categories {
-		rest.InsertNewCategory(category)
+		rest.SaveCategory(category)
 	}
 	auth.SaveUser(&database.User{
 		UserWithoutPassword: &database.UserWithoutPassword{
@@ -95,10 +132,12 @@ func TestLive(t *testing.T) {
 				Address: ""}}}
 	services := map[string]context.Serve{
 		"db":       database.Serve,
+		"dav":      dav.Serve,
 		"api":      rest.Serve,
 		"auth":     auth.Serve,
 		"media":    media.Serve,
-		"template": template.Serve}
+		"template": template.Serve,
+		"pdf":      pdf.Serve}
 	err := make(chan error)
 	go func() {
 		err <- context.InitializeCustomConfig(services, &conf)

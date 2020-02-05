@@ -50,7 +50,7 @@ func (p *PostedOrder) Order() *database.Order {
 	order := &database.Order{
 		BillingAddress:  billingAddress,
 		Company:         p.Company,
-		Date:            &now,
+		Date:            now.Unix(),
 		DeliveryAddress: address,
 		Email:           p.Email,
 		FirstName:       p.FirstName,
