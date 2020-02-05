@@ -15,6 +15,7 @@ var Conf Configuration
 //Struct for the configuration of the application.
 type Configuration struct {
 	Authentication       bool             `json:"authentication"`
+	DavPaths             DavPaths         `json:"davPaths"`
 	GeneratedDirectory   string           `json:"generatedDirectory"`
 	Host                 string           `json:"host"`
 	JWTExpirationMinutes int              `json:"jwtExpirationMinutes"`
@@ -23,6 +24,13 @@ type Configuration struct {
 	Mail                 EmailCredentials `json:"mail"`
 	OrderRetrievers      []*mail.Address  `json:"orderRetrievers"`
 	TemplateInterval     uint             `json:"templateInterval"`
+}
+
+//Struct for all dav related paths
+type DavPaths struct {
+	PayedBills   string `json:"payedBills"`
+	UnpayedBills string `json:"unpayedBills"`
+	Scores       string `json:"scores"`
 }
 
 //Struct for SMTP credentials which will be used for sending mails.
@@ -38,7 +46,12 @@ func defaultConf() *Configuration {
 	secret := make([]byte, 16)
 	rand.Read(secret)
 	return &Configuration{
-		Authentication:     false,
+		Authentication: false,
+		DavPaths: DavPaths{
+			PayedBills:   "Rechnungen/bezahlt",
+			UnpayedBills: "Rechnungen/offen",
+			Scores:       "Noten",
+		},
 		GeneratedDirectory: "gen",
 		Host:               "0.0.0.0:9400",
 		Mail: EmailCredentials{
