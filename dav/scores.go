@@ -28,17 +28,21 @@ func (s *ScoreCollectionNode) append(string, PhantomNode) {
 
 type CategoryNode struct {
 	*BasicNode
-	path string
+	parentPath string
+}
+
+func (c *CategoryNode) Path() string {
+	return c.parentPath + separator + c.Name()
 }
 
 //path is the name to this node, i have to check only it's children
 func (c *CategoryNode) Children() []PhantomNode {
 	nodes := make([]PhantomNode, 0)
-	category := categoryAt(c.path, rest.QueryCategoriesWithChildrenAndScoresPreserve())
+	category := categoryAt(c.Path(), rest.QueryCategoriesWithChildrenAndScoresPreserve())
 	nodes = make([]PhantomNode, len(category.Children)+len(category.Scores))
 	i := 0
 	for _, child := range category.Children {
-		nodes[i] = newCategoryNode(&child)
+		nodes[i] = newCategoryNode(&child, c.Path())
 		i++
 	}
 	for _, score := range category.Scores {
@@ -63,14 +67,19 @@ func categoryAt(path string, categories []database.Category) database.Category {
 	return database.Category{Name: "Black Hole"}
 }
 
-//TODO implement conversion
-func newCategoryNode(category *database.Category) *CategoryNode {
-	return nil
+func newCategoryNode(category *database.Category, parentPath string) *CategoryNode {
+	return &CategoryNode{
+		BasicNode: &BasicNode{
+			name: category.Name},
+		parentPath: parentPath,
+	}
 }
 
-//TODO implement conversion
 func newScoreNode(score *database.Score) *ScoreNode {
-	return nil
+	return &ScoreNode{
+		BasicNode: &BasicNode{
+			name: score.Title},
+	}
 }
 
 type ScoreNode struct {
