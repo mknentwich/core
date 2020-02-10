@@ -35,11 +35,31 @@ func httpOrder(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
+	switch r.Method {
+	case http.MethodGet:
+		httpOrderGet(rw, r, orderId)
+	case http.MethodPost:
+		httpOrderPost(rw, r, orderId)
+	}
+}
+
+func httpOrderGet(rw http.ResponseWriter, r *http.Request, orderId int) {
 	log(context.LOG_INFO, "requested order with id: %d", orderId)
-	//TODO define filename and append some infos such as the number of the bill
-	filename := "des-is-mei-rechnung.pdf"
+	billWriter, filename, err := GeneratePDF(orderId)
 	rw.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
-	//TODO write pdf stream to response body
+	if err != nil {
+		rw.WriteHeader(http.StatusNotFound)
+		log(context.LOG_ERROR, "error while creating bill pdf: %d", err.Error())
+		return
+	}
+	err = billWriter(rw)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		log(context.LOG_ERROR, "error while creating bill pdf: %d", err.Error())
+	}
+}
+
+func httpOrderPost(rw http.ResponseWriter, r *http.Request, orderId int) {
 	utils.HttpImplement(log)(rw, r)
 }
 

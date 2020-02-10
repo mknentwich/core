@@ -1,0 +1,9 @@
+To: {{ .To }}
+From: {{ .From }}
+Subject: Bestellung "{{ .Order.Score.Title }}" in Bearbeitung
+Date: {{ .Date }}
+
+Sehr geehrte/r {{ .Order.Salutation }} {{ .Order.LastName }},
+
+Ihre Bestellung "{{ .Order.Score.Title }}" wird nun an die folgende Adresse versandt: {{ .Order.DeliveryAddress.Street }} {{ .Order.DeliveryAddress.StreetNumber}}, {{ .Order.DeliveryAddress.PostCode}} {{ .Order.DeliveryAddress.City }}, {{ .Order.DeliveryAddress.State }}.
+Die Bestellung enthält ein Exemplar der Rechnung, die ich Sie bitte gemäß der enthaltenen Anweisung einzuzahlen.

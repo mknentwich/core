@@ -3,6 +3,7 @@ package media
 import (
 	"github.com/mknentwich/core/auth"
 	"github.com/mknentwich/core/context"
+	"github.com/mknentwich/core/utils"
 	"net/http"
 	"strconv"
 	"strings"
@@ -29,7 +30,7 @@ func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	outDir = args.GeneratedDirectory
 	err := createDirs()
 	mux := http.NewServeMux()
-	mux.HandleFunc("/score/", httpScore)
+	mux.HandleFunc("/score/", utils.Cors(httpScore))
 	return context.ServiceResult{
 		HttpHandler: mux}, err
 }

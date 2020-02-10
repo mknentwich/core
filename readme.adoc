@@ -1,6 +1,6 @@
 :icons: font
 :toc:
-:source-highlighter: coderay
+:source-highlighter: rouge
 
 = Core Application of the Nentwich Verlag
 
@@ -18,3 +18,5 @@ include::doc/security/security.adoc[]
 include::doc/config/config.adoc[]
 
 include::doc/media/media.adoc[]
+
+include::doc/docker/docker.adoc[]

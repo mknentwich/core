@@ -1,6 +1,11 @@
 package database
 
-import "github.com/jinzhu/gorm"
+import (
+	"database/sql"
+	"github.com/jinzhu/gorm"
+	"strconv"
+	"time"
+)
 
 type Address struct {
 	gorm.Model
@@ -31,30 +36,63 @@ type Score struct {
 
 type Order struct {
 	gorm.Model
-	BillingAddress    Address `json:"billingAddress"`
-	BillingAddressID  uint    `sql:"type:integer REFERENCES addresses(id)" json:"-"`
-	Company           string  `json:"company"`
-	Date              int     `json:"date"`
-	DeliveryAddress   Address `json:"deliveryAddress"`
-	DeliveryAddressID uint    `sql:"type:integer REFERENCES addresses(id)" json:"-"`
-	Email             string  `json:"email"`
-	FirstName         string  `json:"firstName"`
-	LastName          string  `json:"lastName"`
-	Payed             bool    `json:"payed"`
-	ReferenceCount    int     `json:"referenceCount"`
-	Salutation        string  `json:"salutation"`
-	Score             Score   `json:"score"`
-	ScoreID           uint    `sql:"type:integer REFERENCES scores(id)" json:"scoreId"`
-	ScoreAmount       int     `json:"scoreAmount"`
-	Telephone         string  `json:"telephone"`
+	BillingAddress    *Address `json:"billingAddress"`
+	BillingAddressID  uint     `sql:"type:integer REFERENCES addresses(id)" json:"-"`
+	BillingDate       int64    `json:"billingDate"`
+	Company           string   `json:"company"`
+	Date              int64    `json:"date"`
+	DeliveryAddress   *Address `json:"deliveryAddress"`
+	DeliveryAddressID uint     `sql:"type:integer REFERENCES addresses(id)" json:"-"`
+	Email             string   `json:"email"`
+	FirstName         string   `json:"firstName"`
+	LastName          string   `json:"lastName"`
+	Payed             bool     `json:"payed"`
+	ReferenceCount    int      `json:"referenceCount"`
+	Salutation        string   `json:"salutation"`
+	Score             Score    `json:"score"`
+	ScoreID           uint     `sql:"type:integer REFERENCES scores(id)" json:"scoreId"`
+	ScoreAmount       int      `json:"scoreAmount"`
+	Telephone         string   `json:"telephone"`
 }
 
 type User struct {
+	*UserWithoutPassword
+	Password string `json:"password"`
+}
+
+type UserWithoutPassword struct {
 	gorm.Model
 	Email      string `gorm:"primary_key" json:"email"`
 	Admin      bool   `json:"admin"`
 	Name       string `json:"name"`
-	Password   string `json:"-"`
 	LastChange int    `json:"lastChange"`
 	LastLogin  int    `json:"lastLogin"`
+}
+
+//Hook for generating BillingDate and ReferenceCount before Order is saved to the database
+func (order *Order) BeforeSave(db *gorm.DB) (err error) {
+	if order.ReferenceCount == 0 && order.BillingDate == 0 {
+		maxRef := 0
+		now := time.Now()
+		fTime, err := strconv.Atoi(now.Format("20060102"))
+		if err != nil {
+			return err
+		}
+		var s sql.NullString
+		row := db.Table("orders").Select("max(reference_count)").Where("billing_date = ?", &fTime).Row()
+		err = row.Scan(&s)
+		if err != nil {
+			return err
+		}
+		if s.Valid {
+			maxRef, err = strconv.Atoi(s.String)
+			if err != nil {
+				return err
+			}
+		}
+		maxRef++
+		order.BillingDate = int64(fTime)
+		order.ReferenceCount = maxRef
+	}
+	return
 }

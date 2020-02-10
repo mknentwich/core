@@ -1,7 +1,10 @@
 package pdf
 
 import (
+	"fmt"
 	"github.com/jung-kurt/gofpdf"
+	"io"
+	"strings"
 	"time"
 )
 
@@ -9,35 +12,22 @@ import (
 const (
 	sizeHeader            = 10
 	sizeText              = 11
+	sizeBankData          = 14
 	sizeTitle             = 18
+	sizeLogo              = 26
 	marginSide            = 25
 	marginTop             = 12.5
 	marginCustomerAddress = 50.8
 	marginTitle           = marginCustomerAddress + 40
 	marginArticles        = marginTitle + 25
-	marginBankData        = marginArticles + 80
-	marginQrCode          = marginBankData + 10
-	marginQrCodeSide      = marginSide + 110
-	marginNoTaxes         = marginBankData + 40
+	marginBankData        = marginArticles + 88
+	marginQrCode          = marginBankData + 20
+	marginQrCodeSide      = marginSide + 135
 )
 
-type OrderResultPDF struct {
-	City         string
-	PostCode     string
-	State        string
-	Street       string
-	StreetNumber string
-	ID           uint
-	Company      string
-	Date         int
-	FirstName    string
-	LastName     string
-	Salutation   string
-	ScoreAmount  int
-	Title        string
-	Price        float64
-}
+type write func(w io.Writer) error
 
+//Struct for contact details from the company
 type ownAddress struct {
 	name    string
 	street  string
@@ -54,78 +44,78 @@ type bankData struct {
 	bic        string
 	institute  string
 	reference  string
+	price      float64
 }
+
+//Contains the bill information from database call
+var billData OrderResultPDF
+var billNumber string
 
 //Info of the Company/Person
 const sentenceTransfer = "Ich bitte Sie, den Betrag binnen 14 Tagen an das folgende Konto zu überweisen:"
 const sentenceNoTaxes = "Dieser Betrag enthält keine Umsatzsteuer aufgrund §6(2)27 Kleinunternehmerregelung."
 
-//Name of the used logo [svg file]
-const svgEigenverlag = "nentwich.svg"
-
 //Variables for svg handling and document print
-var sig gofpdf.SVGBasicType
 var err error
 var translator func(string) string
 var cellWidthMax float64
 
+//Initializes the bankdata struct
 func initBankData() *bankData {
 	return &bankData{
 		iban:       "AT403209200000258475",
 		ibanPretty: "AT40 3209 2000 0025 8475",
 		bic:        "RLNWATWWGAE",
 		institute:  "RAIFFEISEN-REGIONALBANK",
-		reference:  "[referenceCount]",
+		reference:  billNumber,
 	}
 }
 
+//Initializes the ownAddress struct with static values
 func initOwnAddress() *ownAddress {
 	return &ownAddress{
-		name:    "Markus Nentwich",
-		street:  "Vereinsgasse 25/14",
-		city:    "A-1020 Wien",
-		phone:   "Telefon: +43699 / 10329882",
+		name:   "Markus Nentwich",
+		street: "Vereinsgasse 25/14",
+		city:   "A-1020 Wien",
+		phone:  "Telefon: +43699 / 10329882",
+		//TODO: change email
 		email:   "E-Mail: nentwich94@gmx.at",
-		website: "Webseite: ",
+		website: "Webseite: markus-nentwich.at",
 	}
 }
 
-func initializePdfGeneration() error {
+//Generates pdf bill from given orderId
+//Returns type write (io.Writer), string FileName and error
+func GeneratePDF(id int) (write, string, error) {
+	billData, err = QueryOrderFromIdForPDF(id)
+	if err != nil {
+		return nil, "", err
+	}
+	billNumber = fmt.Sprint(billData.BillingDate) + fmt.Sprintf("%02d", billData.ReferenceCount)
 	var address = initOwnAddress()
 	var bank = initBankData()
-	err := createBillPdf(*address, *bank)
-	return err
+	return createBillPdf(*address, *bank), "Rechnung_" + billNumber, nil
 }
 
 //Creates the bill of an order as a pdf
-func createBillPdf(address ownAddress, bank bankData) error {
+func createBillPdf(address ownAddress, bank bankData) write {
 	//Metadata and adding Page
-	pdf := gofpdf.New("P", "mm", "A4", "")
-	pdf.SetFont("Arial", "", sizeText)
-	pdf.SetTitle("RechnungsNr_[referenceCount]", true)
-	pdf.SetAuthor("Nentwich Eigenverlag", true)
+	pdf := gofpdf.New("P", "mm", "A4", "resource/")
+	pdf.SetTitle("Rechnung_"+billNumber, true)
+	pdf.SetAuthor("Markus Nentwich", true)
+	pdf.AddFont("wiener_melange", "B", "WienerMelange-Bold-new.json")
 	pdf.AddPage()
 	pdf.SetMargins(marginSide, marginTop, marginSide)
 	translator = pdf.UnicodeTranslatorFromDescriptor("")
 	width, _ := pdf.GetPageSize()
 	cellWidthMax = width - 2*marginSide
 	//MN Eigenverlag Image
-	sig, err = gofpdf.SVGBasicFileParse(svgEigenverlag)
-	if err == nil {
-		scale := 250 / sig.Wd
-		scaleY := 75 / sig.Ht
-		if scale > scaleY {
-			scale = scaleY
-		}
-		pdf.SetLineCapStyle("round")
-		pdf.SetLineWidth(0.26458332)
-		pdf.SetDrawColor(238, 73, 87)
-		pdf.SetXY(marginSide-5, marginTop)
-		pdf.SVGBasicWrite(&sig, scale)
-	} else {
-		pdf.SetError(err)
-	}
+	pdf.SetFont("wiener_melange", "B", sizeLogo)
+	var titleTranslator = pdf.UnicodeTranslatorFromDescriptor("cp1252")
+	pdf.SetX(marginSide)
+	pdf.Cell(cellWidthMax, sizeLogo, titleTranslator("Nentwich Verlag"))
 	//Own Address and Contact Info
+	pdf.SetFont("Helvetica", "", sizeText)
 	pdf.SetX(marginSide)
 	pdf.SetY(marginTop)
 	pdf.SetFontSize(sizeHeader)
@@ -140,52 +130,52 @@ func createBillPdf(address ownAddress, bank bankData) error {
 	pdf.CellFormat(cellWidthMax, sizeHeader, translator(address.email), "", 0, "R", false, 0, "")
 	pdf.Ln(sizeHeader / 2)
 	pdf.CellFormat(cellWidthMax, sizeHeader, translator(address.website), "", 0, "R", false, 0, "")
-
-	//Static load
+	//Paint billing address to PDF
 	loadBillingAddress(pdf)
 	//Title and Date of today
 	pdf.SetX(marginSide)
 	pdf.SetY(marginTitle)
 	pdf.SetFontSize(sizeTitle)
 	pdf.SetFontStyle("b")
-	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator("[referenceCount]"), "", 0, "B", false, 0, "")
+	pdf.CellFormat(cellWidthMax, sizeTitle, "Rechnung Nr. "+translator(billNumber), "", 0, "B", false, 0, "")
 	pdf.SetFontSize(sizeText)
 	pdf.SetFontStyle("")
 	pdf.SetX(marginSide)
 	pdf.CellFormat(cellWidthMax, sizeText, "Wien, am "+time.Now().Format("02.01.2006"), "", 1, "RT", false, 0, "")
-	//Static load
-	loadArticles(pdf)
-	//Load bank data
+	//Paint articles
+	bank.price = loadArticles(pdf)
+	//Paint bank data
 	loadBankData(bank, pdf)
-	//Load no Taxes and Signature
-	pdf.SetX(marginSide)
-	pdf.SetY(marginNoTaxes)
-	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceNoTaxes), "", 0, "", false, 0, "")
-
-	err := pdf.OutputFileAndClose("example_bill.pdf")
-	return err
+	return pdf.Output
 }
 
 //Paint the billing loadBillingAddress. All Static, just relevant for Spacing the document
 func loadBillingAddress(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
+	var zHd string
 	pdf.SetFontSize(sizeText)
 	pdf.SetX(marginSide)
 	pdf.SetY(marginCustomerAddress)
-	pdf.Cell(cellWidthMax, sizeText, "Salutation / [Company]")
+	if len(billData.Company) > 0 {
+		zHd = "z.Hd. "
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.Company))
+	} else {
+		if len(billData.Salutation) > 0 {
+			pdf.Cell(cellWidthMax, sizeText, translator(billData.Salutation))
+		}
+	}
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, "[z.Hd.] FirstName + LastName")
+	pdf.Cell(cellWidthMax, sizeText, translator(zHd+billData.FirstName+" "+billData.LastName))
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, "BillingAddress 1")
+	pdf.Cell(cellWidthMax, sizeText, translator(billData.Street+" "+billData.StreetNumber))
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, "BillingAddress 2")
+	pdf.Cell(cellWidthMax, sizeText, translator(billData.PostCode+" "+billData.City))
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, "STATE [if not austria]")
+	pdf.Cell(cellWidthMax, sizeText, translator(billData.State))
 	return pdf
 }
 
-//Paint Articles. All Static, just relevant for Spacing the document
-func loadArticles(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
-	//Header
+//Paint articles to the pdf, returns total price
+func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	pdf.SetX(marginSide)
 	pdf.SetY(marginArticles)
 	pdf.SetFontStyle("b")
@@ -193,49 +183,70 @@ func loadArticles(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 	pdf.CellFormat(cellWidthMax/9*5, sizeText, "Beschreibung", "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "Einzelpreis", "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "Gesamtpreis", "B", 1, "R", false, 0, "")
-	//Body
+	price := float64(billData.ScoreAmount) * billData.Price
 	pdf.SetFontStyle("")
-	pdf.CellFormat(cellWidthMax/9, sizeText, "1", "", 0, "", false, 0, "")
-	pdf.CellFormat(cellWidthMax/9*5, sizeText, "Eine letzte Runde (Blasorchesterfassung)", "", 0, "", false, 0, "")
-	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator("39,00 €"), "", 0, "R", false, 0, "")
-	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator("39,00 €"), "", 0, "R", false, 0, "")
+	pdf.CellFormat(cellWidthMax/9, sizeText, translator(fmt.Sprint(billData.ScoreAmount)), "", 0, "", false, 0, "")
+	pdf.CellFormat(cellWidthMax/9*5, sizeText, translator(billData.Title), "", 0, "", false, 0, "")
+	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", billData.Price)+" €"), "", 0, "R", false, 0, "")
+	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", price)+" €"), "", 0, "R", false, 0, "")
 	pdf.Ln(sizeText / 2)
 	pdf.CellFormat(cellWidthMax/9, sizeText, "", "B", 0, "", false, 0, "")
-	pdf.CellFormat(cellWidthMax/9*5, sizeText, translator("Versand (Österreich)"), "B", 0, "", false, 0, "")
+	pdf.CellFormat(cellWidthMax/9*5, sizeText, translator("Versand ("+billData.State+")"), "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "", "B", 0, "R", false, 0, "")
-	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator("3,00 €"), "B", 1, "R", false, 0, "")
+	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", checkDeliveryCosts())+" €"), "B", 1, "R", false, 0, "")
+	price += checkDeliveryCosts()
 	pdf.SetFontStyle("b")
 	pdf.CellFormat(cellWidthMax/9, sizeText, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*5, sizeText, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "Summe", "", 0, "R", false, 0, "")
-	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator("42,00 €"), "", 1, "R", false, 0, "")
+	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", price)+" €"), "", 1, "R", false, 0, "")
 	pdf.SetFontStyle("")
-	return pdf
+	//Load no taxes sentence
+	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceNoTaxes), "", 0, "C", false, 0, "")
+	return price
+}
+
+//TODO: Implement database table for delivery costs to create dynamic values for each country
+func checkDeliveryCosts() float64 {
+	var price float64
+	switch strings.ToLower(billData.State) {
+	case "österreich":
+		price = 3
+	case "deutschland":
+		price = 5.6
+	}
+	return price
 }
 
 //Paint data of the bank connection
-func loadBankData(bank bankData, pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
+func loadBankData(bank bankData, pdf *gofpdf.Fpdf) {
 	pdf.SetX(marginSide)
 	pdf.SetY(marginBankData)
 	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceTransfer), "", 1, "", false, 0, "")
-	pdf.Cell(cellWidthMax/4, sizeText, "IBAN:")
-	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.ibanPretty))
-	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax/4, sizeText, "BIC:")
-	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.bic))
-	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax/4, sizeText, "Geldinstitut:")
-	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.institute))
-	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax/4, sizeText, "Zahlungsreferenz:")
+	pdf.Ln(sizeText / 1.5)
+	pdf.SetFontSize(sizeBankData)
+	pdf.Cell(cellWidthMax/3, sizeText, "IBAN:")
+	pdf.Cell(cellWidthMax/3, sizeText, translator(bank.ibanPretty))
+	pdf.Ln(sizeText / 1.5)
+	pdf.Cell(cellWidthMax/3, sizeText, "BIC:")
+	pdf.Cell(cellWidthMax/3, sizeText, translator(bank.bic))
+	pdf.Ln(sizeText / 1.5)
+	pdf.Cell(cellWidthMax/3, sizeText, "Geldinstitut:")
+	pdf.Cell(cellWidthMax/3, sizeText, translator(bank.institute))
+	pdf.Ln(sizeText / 1.5)
 	pdf.SetFontStyle("b")
-	pdf.Cell(cellWidthMax/4, sizeText, translator(bank.reference))
-	pdf.SetFontStyle("")
-	pdf.Ln(sizeText / 2)
+	pdf.Cell(cellWidthMax/3, sizeText, "Zahlungsreferenz:")
+	pdf.Cell(cellWidthMax/3, sizeText, translator(bank.reference))
+	pdf.Ln(sizeText * 1.5)
 	paintQRCode(generateQrCode(bank), pdf)
-	return pdf
+	pdf.SetFontSize(sizeText)
+	pdf.CellFormat(cellWidthMax, sizeText, translator("Im Feld Zahlungsreferenz unbedingt obige Nummer anführen,"), "", 0, "C", false, 0, "")
+	pdf.Ln(sizeText / 2)
+	pdf.CellFormat(cellWidthMax, sizeText, translator("ansonsten kann die Zahlung nicht zugeordnet werden!"), "", 0, "C", false, 0, "")
+	pdf.SetFontStyle("")
 }
 
+//Paint generated qr code to bill
 func paintQRCode(bitmap [][]bool, pdf *gofpdf.Fpdf) {
 	var qrScale = 0.5
 	for rows := range bitmap {

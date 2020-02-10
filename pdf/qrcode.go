@@ -1,9 +1,11 @@
 package pdf
 
 import (
+	"fmt"
 	"github.com/skip2/go-qrcode"
 )
 
+//Struct for qr code handling
 type qrDataFields struct {
 	serviceTag     string
 	version        string
@@ -19,6 +21,7 @@ type qrDataFields struct {
 	display        string
 }
 
+//Returns initialized qr code struct
 func initializeQrDataFields(bank bankData) *qrDataFields {
 	return &qrDataFields{
 		serviceTag:     "BCD",
@@ -28,7 +31,7 @@ func initializeQrDataFields(bank bankData) *qrDataFields {
 		bic:            bank.bic,
 		receiver:       "Markus Nentwich",
 		iban:           bank.iban,
-		amountCurrency: "EUR0.01",
+		amountCurrency: "EUR" + fmt.Sprintf("%.2f", bank.price),
 		purpose:        "",
 		reference:      bank.reference,
 		text:           "",
@@ -36,6 +39,8 @@ func initializeQrDataFields(bank bankData) *qrDataFields {
 	}
 }
 
+//Generates new QR Code from initialized qr code struct
+//RecoveryLevel = Medium , VersionNumber = 13 due to qr code payment standards
 func generateQrCode(bank bankData) [][]bool {
 	var qrData = initializeQrDataFields(bank)
 	var code *qrcode.QRCode
