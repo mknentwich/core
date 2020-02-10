@@ -45,7 +45,7 @@ func httpOrder(rw http.ResponseWriter, r *http.Request) {
 
 func httpOrderGet(rw http.ResponseWriter, r *http.Request, orderId int) {
 	log(context.LOG_INFO, "requested order with id: %d", orderId)
-	billWriter, filename, err := writeBill(orderId)
+	billWriter, filename, err := GeneratePDF(orderId)
 	rw.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)

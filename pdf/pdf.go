@@ -85,7 +85,8 @@ func initOwnAddress() *ownAddress {
 }
 
 //Generates pdf bill from given orderId
-func writeBill(id int) (write, string, error) {
+//Returns type write (io.Writer), string FileName and error
+func GeneratePDF(id int) (write, string, error) {
 	billData, err = QueryOrderFromIdForPDF(id)
 	if err != nil {
 		return nil, "", err

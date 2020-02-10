@@ -67,7 +67,7 @@ func TestPDF(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		write, _, err := writeBill(1)
+		write, _, err := GeneratePDF(1)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
@@ -80,7 +80,7 @@ func TestPDF(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		write, _, err = writeBill(2)
+		write, _, err = GeneratePDF(2)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
@@ -93,7 +93,7 @@ func TestPDF(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		write, _, err = writeBill(3)
+		write, _, err = GeneratePDF(3)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
