@@ -1,6 +1,11 @@
 package database
 
-import "github.com/jinzhu/gorm"
+import (
+	"database/sql"
+	"github.com/jinzhu/gorm"
+	"strconv"
+	"time"
+)
 
 type Address struct {
 	gorm.Model
@@ -58,4 +63,32 @@ type User struct {
 	Password   string `json:"-"`
 	LastChange int    `json:"lastChange"`
 	LastLogin  int    `json:"lastLogin"`
+}
+
+//Hook for generating BillingDate and ReferenceCount before Order is saved to the database
+func (order *Order) BeforeSave(db *gorm.DB) (err error) {
+	if order.ReferenceCount == 0 && order.BillingDate == 0 {
+		maxRef := 0
+		time := time.Now()
+		fTime, err := strconv.Atoi(time.Format("20060102"))
+		if err != nil {
+			return err
+		}
+		var s sql.NullString
+		row := db.Table("orders").Select("max(reference_count)").Where("billing_date = ?", &fTime).Row()
+		err = row.Scan(&s)
+		if err != nil {
+			return err
+		}
+		if s.Valid {
+			maxRef, err = strconv.Atoi(s.String)
+			if err != nil {
+				return err
+			}
+		}
+		maxRef++
+		order.BillingDate = fTime
+		order.ReferenceCount = maxRef
+	}
+	return
 }
