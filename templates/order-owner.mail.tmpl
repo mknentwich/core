@@ -1,0 +1,11 @@
+To: {{ .To }}
+From: {{ .From }}
+Subject: Jemand hat etwas bestellt
+Date: {{ .Date }}
+
+{{ .Order.FirstName }} {{ .Order.LastName}} hat {{ .Order.Score.Title }} bestellt.
+Die Kontaktdaten sind:
+    Adresse: {{ .Order.DeliveryAddress.Street }} {{ .Order.DeliveryAddress.StreetNumber}}, {{ .Order.DeliveryAddress.PostCode}} {{ .Order.DeliveryAddress.City }}, {{ .Order.DeliveryAddress.State }}
+    Email: {{ .Order.Email }}
+    Firma: {{ .Order.Company }}
+    Telefon: {{ .Order.Telephone }}

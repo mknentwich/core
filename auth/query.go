@@ -6,23 +6,27 @@ import (
 
 func queryUserByEmail(email string) *database.User {
 	var user database.User
-	database.Receive().Where(&database.User{Email: email}).Find(&user)
+	err := database.Receive().Where(&database.User{UserWithoutPassword: &database.UserWithoutPassword{Email: email}}).Find(&user).Error
+	if err != nil {
+		return nil
+	}
 	return &user
 }
 
-func insertUser(user *database.User, password string) error {
-	credentials := &Credentials{Email: user.Email, Password: password}
-	database.Receive().Save(user)
-	return updatePassword(credentials)
-}
-
-func updatePassword(credentials *Credentials) error {
-	password, err := hashPassword(credentials.Password)
-	if err != nil {
-		return err
+func SaveUser(user *database.User) error {
+	if us := queryUserByEmail(user.Email); us == nil {
+		database.Receive().Save(user)
+	} else {
+		database.Receive().Model(user).Updates(user)
 	}
-	user := queryUserByEmail(credentials.Email)
-	user.Password = password
-	database.Receive().Save(user)
+	if user.Password != "" {
+		password, err := hashPassword(user.Password)
+		if err != nil {
+			return err
+		}
+		user := queryUserByEmail(user.Email)
+		user.Password = password
+		database.Receive().Save(user)
+	}
 	return nil
 }

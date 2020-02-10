@@ -1,4 +1,4 @@
-:order-url: /api/bills
+:order-url: /api/order
 :chck: icon:check[]
 :nch: icon:times[]
 
@@ -52,6 +52,7 @@ The first step which is required to create a new order is to send a `POST` to `{
 |`bstreetNumber`|Billing street number|`string`
 |`city`|Delivery city|`string`|{chck}
 |`postCode`|Delivery post code|`string`|{chck}
+|`scoreId`|Score which was ordered|`number`|{chck}
 |`state`|Delivery state|`string`|{chck}
 |`street`|Delivery street|`string`|{chck}
 |`streetNumber`|Delivery street number|`string`|{chck}
