@@ -7,34 +7,12 @@ import (
 	"github.com/mknentwich/core/rest"
 	"net/http"
 	"os"
-	"reflect"
 	"testing"
 )
 
 var address database.Address
 var order database.Order
 var score database.Score
-
-//Updates Fields from values of the local variables
-func getExpectedResult() OrderResultPDF {
-	return OrderResultPDF{
-		City:           address.City,
-		PostCode:       address.PostCode,
-		State:          address.State,
-		Street:         address.Street,
-		StreetNumber:   address.StreetNumber,
-		Company:        order.Company,
-		Date:           order.Date,
-		FirstName:      order.FirstName,
-		LastName:       order.LastName,
-		Salutation:     order.Salutation,
-		ScoreAmount:    order.ScoreAmount,
-		BillingDate:    order.BillingDate,
-		ReferenceCount: order.ReferenceCount,
-		Title:          score.Title,
-		Price:          score.Price,
-	}
-}
 
 //Starts database service at begin of testing
 func TestMain(m *testing.M) {
@@ -60,10 +38,8 @@ func TestPDF(t *testing.T) {
 		if err != nil {
 			t.Error(err.Error())
 		}
-		expectedResult := getExpectedResult()
-		expectedResult.ID = 1
-		if reflect.DeepEqual(result, expectedResult) == false {
-			t.Errorf("%s", "Object from the database and local Object aren't the same!")
+		if result.ReferenceCount != 1 {
+			t.Errorf("%s", "Wrong ReferenceCount from Trigger")
 		}
 	})
 	t.Run("InsertTestData_2", func(t *testing.T) {
@@ -72,10 +48,8 @@ func TestPDF(t *testing.T) {
 		if err != nil {
 			t.Error(err.Error())
 		}
-		expectedResult := getExpectedResult()
-		expectedResult.ID = 2
-		if reflect.DeepEqual(result, expectedResult) == false {
-			t.Errorf("%s", "Object from the database and local Object aren't the same!")
+		if result.ReferenceCount != 2 {
+			t.Errorf("%s", "Wrong ReferenceCount from Trigger")
 		}
 	})
 	t.Run("InsertTestData_3", func(t *testing.T) {
@@ -84,10 +58,8 @@ func TestPDF(t *testing.T) {
 		if err != nil {
 			t.Error(err.Error())
 		}
-		expectedResult := getExpectedResult()
-		expectedResult.ID = 3
-		if reflect.DeepEqual(result, expectedResult) == false {
-			t.Errorf("%s", "Object from the database and local Object aren't the same!")
+		if result.ReferenceCount != 3 {
+			t.Errorf("%s", "Wrong ReferenceCount from Trigger")
 		}
 	})
 	t.Run("PDFCreationFromTestData", func(t *testing.T) {
@@ -117,7 +89,7 @@ func TestPDF(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		f, err = os.OpenFile("example-bill-existing-refCount.pdf", os.O_RDWR|os.O_CREATE, 0600)
+		f, err = os.OpenFile("example-bill-customer2.pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
@@ -260,8 +232,6 @@ func insertTestData3() {
 		Score:           score,
 		ScoreAmount:     1,
 		Telephone:       "",
-		BillingDate:     20190126,
-		ReferenceCount:  5,
 	}
 	err = rest.SaveOrder(order)
 	if err != nil {

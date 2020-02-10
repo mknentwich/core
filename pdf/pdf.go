@@ -3,9 +3,7 @@ package pdf
 import (
 	"fmt"
 	"github.com/jung-kurt/gofpdf"
-	"github.com/mknentwich/core/database"
 	"io"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -76,62 +74,26 @@ func initBankData() *bankData {
 //Initializes the ownAddress struct with static values
 func initOwnAddress() *ownAddress {
 	return &ownAddress{
-		name:    "Markus Nentwich",
-		street:  "Vereinsgasse 25/14",
-		city:    "A-1020 Wien",
-		phone:   "Telefon: +43699 / 10329882",
+		name:   "Markus Nentwich",
+		street: "Vereinsgasse 25/14",
+		city:   "A-1020 Wien",
+		phone:  "Telefon: +43699 / 10329882",
+		//TODO: change email
 		email:   "E-Mail: nentwich94@gmx.at",
 		website: "Webseite: markus-nentwich.at",
 	}
 }
 
 //Generates pdf bill from given orderId
-func writeBill(orderId int) (write, string, error) {
-	billData, err = QueryOrderFromIdForPDF(orderId)
+func writeBill(id int) (write, string, error) {
+	billData, err = QueryOrderFromIdForPDF(id)
 	if err != nil {
 		return nil, "", err
 	}
-	err = checkBillNumber(orderId)
-	if err != nil {
-		return nil, "", err
-	}
+	billNumber = fmt.Sprint(billData.BillingDate) + fmt.Sprintf("%02d", billData.ReferenceCount)
 	var address = initOwnAddress()
 	var bank = initBankData()
 	return createBillPdf(*address, *bank), "Rechnung_" + billNumber, nil
-}
-
-//Checks if billingDate and referenceCount is already set for this order and sets local billNumber
-//If not, both gets generated and updated at the database
-func checkBillNumber(orderId int) error {
-	if billData.BillingDate == 0 && billData.ReferenceCount == 0 {
-		time := time.Now()
-		fTime, err := strconv.Atoi(time.Format("20060102"))
-		if err != nil {
-			return err
-		}
-		maxReferenceCount, err := QueryMaxReferenceCountToday(fTime)
-		if err != nil {
-			return err
-		}
-		maxReferenceCount++
-		order := database.Order{
-			BillingDate:    fTime,
-			ReferenceCount: maxReferenceCount,
-		}
-		err = UpdateOrders(orderId, &order)
-		if err != nil {
-			return err
-		}
-		setBillNumber(fTime, maxReferenceCount)
-	} else {
-		setBillNumber(billData.BillingDate, billData.ReferenceCount)
-	}
-	return err
-}
-
-//Sets local billNumber. Contains billingDate & referenceCount
-func setBillNumber(billingDate int, referenceCount int) {
-	billNumber = fmt.Sprint(billingDate) + fmt.Sprintf("%02d", referenceCount)
 }
 
 //Creates the bill of an order as a pdf
