@@ -8,6 +8,10 @@ import (
 type DataQuery func() interface{}
 
 func QueryCategoriesWithChildrenAndScores() interface{} {
+	return QueryCategoriesWithChildrenAndScoresPreserve()
+}
+
+func QueryCategoriesWithChildrenAndScoresPreserve() []database.Category {
 	categories := make([]database.Category, 0)
 	database.Receive().Preload("Children", func(d *gorm.DB) *gorm.DB {
 		return d.Order("name").Preload("Scores", func(d2 *gorm.DB) *gorm.DB {
