@@ -5,6 +5,7 @@ import (
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
 	"github.com/mknentwich/core/rest"
+	"io"
 	"net/http"
 	"os"
 	"testing"
@@ -63,45 +64,36 @@ func TestPDF(t *testing.T) {
 		}
 	})
 	t.Run("PDFCreationFromTestData", func(t *testing.T) {
-		f, err := os.OpenFile("example-bill-company.pdf", os.O_RDWR|os.O_CREATE, 0600)
-		if err != nil {
-			t.Errorf("Error on creating the bill pdf: %s", err.Error())
-		}
-		write, _, err := GeneratePDF(1)
+		reader, filename, err := GeneratePDF(1)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
 		}
-		err = write(f)
+		f, err := os.OpenFile("Rechnung_" + filename + ".pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		f, err = os.OpenFile("example-bill-customer.pdf", os.O_RDWR|os.O_CREATE, 0600)
-		if err != nil {
-			t.Errorf("Error on creating the bill pdf: %s", err.Error())
-		}
-		write, _, err = GeneratePDF(2)
+		io.Copy(f,reader)
+		reader, filename, err = GeneratePDF(2)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
 		}
-		err = write(f)
+		f, err = os.OpenFile("Rechnung_" + filename + ".pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		f, err = os.OpenFile("example-bill-customer2.pdf", os.O_RDWR|os.O_CREATE, 0600)
-		if err != nil {
-			t.Errorf("Error on creating the bill pdf: %s", err.Error())
-		}
-		write, _, err = GeneratePDF(3)
+		io.Copy(f,reader)
+		reader, filename, err = GeneratePDF(3)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
 		}
-		err = write(f)
+		f, err = os.OpenFile("Rechnung_" + filename + ".pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
+		io.Copy(f,reader)
 	})
 }
 
