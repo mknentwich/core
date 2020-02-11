@@ -1,6 +1,8 @@
 package pdf
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"github.com/jung-kurt/gofpdf"
 	"io"
@@ -25,8 +27,6 @@ const (
 	marginQrCodeSide      = marginSide + 135
 )
 
-type write func(w io.Writer) error
-
 //Struct for contact details from the company
 type ownAddress struct {
 	name    string
@@ -46,6 +46,9 @@ type bankData struct {
 	reference  string
 	price      float64
 }
+
+//Buffer, where PDF stream will be loaded into
+var result bytes.Buffer
 
 //Contains the bill information from database call
 var billData OrderResultPDF
@@ -85,8 +88,8 @@ func initOwnAddress() *ownAddress {
 }
 
 //Generates pdf bill from given orderId
-//Returns type write (io.Writer), string FileName and error
-func GeneratePDF(id int) (write, string, error) {
+//Returns reader, billNumber and error
+func GeneratePDF(id int) (io.Reader, string, error) {
 	billData, err = QueryOrderFromIdForPDF(id)
 	if err != nil {
 		return nil, "", err
@@ -94,11 +97,15 @@ func GeneratePDF(id int) (write, string, error) {
 	billNumber = fmt.Sprint(billData.BillingDate) + fmt.Sprintf("%02d", billData.ReferenceCount)
 	var address = initOwnAddress()
 	var bank = initBankData()
-	return createBillPdf(*address, *bank), "Rechnung_" + billNumber, nil
+	err = createBillPdf(*address, *bank)
+	if err != nil {
+		return nil, "", err
+	}
+	return bufio.NewReader(&result), billNumber, nil
 }
 
 //Creates the bill of an order as a pdf
-func createBillPdf(address ownAddress, bank bankData) write {
+func createBillPdf(address ownAddress, bank bankData) error {
 	//Metadata and adding Page
 	pdf := gofpdf.New("P", "mm", "A4", "resource/")
 	pdf.SetTitle("Rechnung_"+billNumber, true)
@@ -146,7 +153,7 @@ func createBillPdf(address ownAddress, bank bankData) write {
 	bank.price = loadArticles(pdf)
 	//Paint bank data
 	loadBankData(bank, pdf)
-	return pdf.Output
+	return pdf.Output(&result)
 }
 
 //Paint the billing loadBillingAddress. All Static, just relevant for Spacing the document
