@@ -71,7 +71,7 @@ func InsertTestData() {
 		{
 			BillingAddress:  &adr,
 			Company:         "Millionen Show",
-			Date:            &t,
+			Date:            t.Unix(),
 			DeliveryAddress: &adr,
 			Email:           "jauch@werwirdswohl.de",
 			FirstName:       "Günter",
@@ -107,7 +107,13 @@ func InsertTestData() {
 
 func TestLive(t *testing.T) {
 	conf := context.Configuration{
-		GeneratedDirectory:   "gen",
+		GeneratedDirectory: "gen",
+		TemplateInterval:   5,
+		DavPaths: context.DavPaths{
+			PayedBills:   "Rechnungen/bezahlt",
+			UnpayedBills: "Rechnungen/offen",
+			Scores:       "Werke",
+		},
 		Authentication:       false,
 		Host:                 "127.0.0.1:9400",
 		JWTExpirationMinutes: 4,
