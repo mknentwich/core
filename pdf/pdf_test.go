@@ -131,10 +131,10 @@ func insertTestData() {
 	}
 	err = rest.SaveScore(score)
 	order = database.Order{
-		BillingAddress:  address,
+		BillingAddress:  &address,
 		Company:         "Millionen Show",
 		Date:            1568024628000,
-		DeliveryAddress: address,
+		DeliveryAddress: &address,
 		Email:           "jauch@werwirdswohl.de",
 		FirstName:       "Günter",
 		LastName:        "Jauch",
@@ -176,10 +176,10 @@ func insertTestData2() {
 		err.Error()
 	}
 	order = database.Order{
-		BillingAddress:  address,
+		BillingAddress:  &address,
 		Company:         "",
 		Date:            10022018,
-		DeliveryAddress: address,
+		DeliveryAddress: &address,
 		Email:           "hpberger@spengergasse.at",
 		FirstName:       "Hans-Peter",
 		LastName:        "Berger",
@@ -220,10 +220,10 @@ func insertTestData3() {
 		err.Error()
 	}
 	order = database.Order{
-		BillingAddress:  address,
+		BillingAddress:  &address,
 		Company:         "",
 		Date:            20190201,
-		DeliveryAddress: address,
+		DeliveryAddress: &address,
 		Email:           "e11908080@student.tuwien.ac.at",
 		FirstName:       "Richard",
 		LastName:        "Stëckl",
