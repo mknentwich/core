@@ -20,7 +20,7 @@ type Address struct {
 type State struct {
 	gorm.Model
 	Name          string  `json:"name"`
-	DeliveryPrice float64 `json:"price"`
+	DeliveryPrice float64 `json:"deliveryPrice"`
 }
 
 type Category struct {
