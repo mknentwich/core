@@ -11,6 +11,7 @@ import (
 	"testing"
 )
 
+var country database.State
 var address database.Address
 var order database.Order
 var score database.Score
@@ -69,40 +70,44 @@ func TestPDF(t *testing.T) {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
 		}
-		f, err := os.OpenFile("Rechnung_" + filename + ".pdf", os.O_RDWR|os.O_CREATE, 0600)
+		f, err := os.OpenFile("Rechnung_"+filename+".pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		io.Copy(f,reader)
+		io.Copy(f, reader)
 		reader, filename, err = GeneratePDF(2)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
 		}
-		f, err = os.OpenFile("Rechnung_" + filename + ".pdf", os.O_RDWR|os.O_CREATE, 0600)
+		f, err = os.OpenFile("Rechnung_"+filename+".pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		io.Copy(f,reader)
+		io.Copy(f, reader)
 		reader, filename, err = GeneratePDF(3)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
 		}
-		f, err = os.OpenFile("Rechnung_" + filename + ".pdf", os.O_RDWR|os.O_CREATE, 0600)
+		f, err = os.OpenFile("Rechnung_"+filename+".pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		io.Copy(f,reader)
+		io.Copy(f, reader)
 	})
 }
 
 //Inserts TestData to the Database
 func insertTestData() {
+	country = database.State{
+		Name:          "Deutschland",
+		DeliveryPrice: 7,
+	}
 	address = database.Address{
 		City:         "Hürth",
 		PostCode:     "50354",
-		State:        "Deutschland",
+		State:        &country,
 		Street:       "Kalscheurener Straße",
 		StreetNumber: "89",
 	}
@@ -144,10 +149,14 @@ func insertTestData() {
 
 //Inserts TestData to the Database
 func insertTestData2() {
+	country = database.State{
+		Name:          "Österreich",
+		DeliveryPrice: 3,
+	}
 	address = database.Address{
 		City:         "Wien",
 		PostCode:     "1050",
-		State:        "Österreich",
+		State:        &country,
 		Street:       "Spengergasse",
 		StreetNumber: "20",
 	}
@@ -188,10 +197,14 @@ func insertTestData2() {
 }
 
 func insertTestData3() {
+	country = database.State{
+		Name:          "Österreich",
+		DeliveryPrice: 3,
+	}
 	address = database.Address{
 		City:         "Leopoldsdorf im Marchfelde",
 		PostCode:     "2285",
-		State:        "Österreich",
+		State:        &country,
 		Street:       "Leopold-Figl-Gasse",
 		StreetNumber: "2c",
 	}

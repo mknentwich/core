@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/jung-kurt/gofpdf"
 	"io"
-	"strings"
 	"time"
 )
 
@@ -138,7 +137,7 @@ func createBillPdf(address ownAddress, bank bankData) error {
 	pdf.Ln(sizeHeader / 2)
 	pdf.CellFormat(cellWidthMax, sizeHeader, translator(address.website), "", 0, "R", false, 0, "")
 	//Paint billing address to PDF
-	loadBillingAddress(pdf)
+	loadAddressesCustomer(pdf)
 	//Title and Date of today
 	pdf.SetX(marginSide)
 	pdf.SetY(marginTitle)
@@ -156,8 +155,8 @@ func createBillPdf(address ownAddress, bank bankData) error {
 	return pdf.Output(&result)
 }
 
-//Paint the billing loadBillingAddress. All Static, just relevant for Spacing the document
-func loadBillingAddress(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
+//Paint the Addresses of the Customer
+func loadAddressesCustomer(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 	var zHd string
 	pdf.SetFontSize(sizeText)
 	pdf.SetX(marginSide)
@@ -177,12 +176,13 @@ func loadBillingAddress(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 	pdf.Ln(sizeText / 2)
 	pdf.Cell(cellWidthMax, sizeText, translator(billData.PostCode+" "+billData.City))
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, translator(billData.State))
+	pdf.Cell(cellWidthMax, sizeText, translator(billData.Name))
 	return pdf
 }
 
 //Paint articles to the pdf, returns total price
 func loadArticles(pdf *gofpdf.Fpdf) float64 {
+	price := float64(billData.ScoreAmount) * billData.Price
 	pdf.SetX(marginSide)
 	pdf.SetY(marginArticles)
 	pdf.SetFontStyle("b")
@@ -190,7 +190,6 @@ func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	pdf.CellFormat(cellWidthMax/9*5, sizeText, "Beschreibung", "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "Einzelpreis", "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "Gesamtpreis", "B", 1, "R", false, 0, "")
-	price := float64(billData.ScoreAmount) * billData.Price
 	pdf.SetFontStyle("")
 	pdf.CellFormat(cellWidthMax/9, sizeText, translator(fmt.Sprint(billData.ScoreAmount)), "", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*5, sizeText, translator(billData.Title), "", 0, "", false, 0, "")
@@ -198,10 +197,10 @@ func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", price)+" €"), "", 0, "R", false, 0, "")
 	pdf.Ln(sizeText / 2)
 	pdf.CellFormat(cellWidthMax/9, sizeText, "", "B", 0, "", false, 0, "")
-	pdf.CellFormat(cellWidthMax/9*5, sizeText, translator("Versand ("+billData.State+")"), "B", 0, "", false, 0, "")
+	pdf.CellFormat(cellWidthMax/9*5, sizeText, translator("Versand ("+billData.Name+")"), "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "", "B", 0, "R", false, 0, "")
-	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", checkDeliveryCosts())+" €"), "B", 1, "R", false, 0, "")
-	price += checkDeliveryCosts()
+	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", billData.DeliveryPrice)+" €"), "B", 1, "R", false, 0, "")
+	price += billData.DeliveryPrice
 	pdf.SetFontStyle("b")
 	pdf.CellFormat(cellWidthMax/9, sizeText, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*5, sizeText, "", "", 0, "", false, 0, "")
@@ -210,18 +209,6 @@ func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	pdf.SetFontStyle("")
 	//Load no taxes sentence
 	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceNoTaxes), "", 0, "C", false, 0, "")
-	return price
-}
-
-//TODO: Implement database table for delivery costs to create dynamic values for each country
-func checkDeliveryCosts() float64 {
-	var price float64
-	switch strings.ToLower(billData.State) {
-	case "österreich":
-		price = 3
-	case "deutschland":
-		price = 5.6
-	}
 	return price
 }
 
