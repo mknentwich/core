@@ -7,25 +7,11 @@ import (
 
 type DataQuery func() interface{}
 
-type OrderResultPDF struct {
-	City           string
-	PostCode       string
-	State          string
-	Street         string
-	StreetNumber   string
-	ID             uint
-	Company        string
-	Date           int
-	FirstName      string
-	LastName       string
-	Salutation     string
-	ScoreAmount    int
-	Title          string
-	Price          float64
-	ReferenceCount int
+func QueryCategoriesWithChildrenAndScores() interface{} {
+	return QueryCategoriesWithChildrenAndScoresPreserve()
 }
 
-func QueryCategoriesWithChildrenAndScores() interface{} {
+func QueryCategoriesWithChildrenAndScoresPreserve() []database.Category {
 	categories := make([]database.Category, 0)
 	database.Receive().Preload("Children", func(d *gorm.DB) *gorm.DB {
 		return d.Order("name").Preload("Scores", func(d2 *gorm.DB) *gorm.DB {
@@ -35,13 +21,10 @@ func QueryCategoriesWithChildrenAndScores() interface{} {
 	return categories
 }
 
-//Selects order by ID and serves a result struct for better bill handling
-func QueryOrderFromIdForPDF(id int) OrderResultPDF {
-	var pdfOrderResult OrderResultPDF
-	database.Receive().Table("orders").Select("addresses.city, addresses.post_code, addresses.state, addresses.street, addresses.street_number, "+
-		"orders.id, orders.company, orders.date, orders.first_name, orders.last_name, orders.salutation, orders.score_amount, orders.reference_count, scores.title, scores.price").Joins("inner join addresses on orders.billing_address_id = addresses.id").
-		Joins("inner join scores on orders.score_id = scores.id").Where("orders.id = ?", id).Find(&pdfOrderResult).Scan(&pdfOrderResult)
-	return pdfOrderResult
+func QueryOrders(payed bool) []database.Order {
+	orders := make([]database.Order, 0)
+	database.Receive().Where("payed = ?", payed).Find(&orders)
+	return orders
 }
 
 //Finds the highest referenceCount value from the orders table
@@ -58,21 +41,34 @@ func InsertNewAddress(address database.Address) error {
 	return err
 }
 
-//Inserts new category to the database
-func InsertNewCategory(category database.Category) error {
-	err := database.Receive().Create(&category).Error
+//Inserts or updates a address to the database
+func SaveAddress(address database.Address) error {
+	err := database.Receive().Save(&address).Error
 	return err
 }
 
-//Inserts new score to the database
-func InsertNewScore(score database.Score) error {
-	err := database.Receive().Create(&score).Error
+//Inserts or updates a category to the database
+func SaveCategory(category database.Category) error {
+	err := database.Receive().Save(&category).Error
+	return err
+}
+
+//Inserts or updates a score to the database
+func SaveScore(score database.Score) error {
+	err := database.Receive().Save(&score).Error
 	return err
 }
 
 //Inserts new order to the database
-func InsertNewOrder(order database.Order) error {
-	err := database.Receive().Create(&order).Error
+func InsertNewOrder(order *database.Order) error {
+	err := database.Receive().Create(order).Error
+	database.Receive().Preload("Score").Find(order)
+	return err
+}
+
+//Inserts or updates a order to the database
+func SaveOrder(order database.Order) error {
+	err := database.Receive().Save(&order).Error
 	return err
 }
 

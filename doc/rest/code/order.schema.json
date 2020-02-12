@@ -61,6 +61,9 @@
     "referenceCount": {
       "type": "number"
     },
+    "billing_date": {
+      "type": "number"
+    },
     "salutation": {
       "type": "string"
     },
