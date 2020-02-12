@@ -30,7 +30,9 @@ func (p *PostedOrder) Order() *database.Order {
 	address := &database.Address{
 		City:         p.City,
 		PostCode:     p.PostCode,
-		State:        p.State,
+		State:        &database.State{
+			Name: p.State,
+		},
 		Street:       p.Street,
 		StreetNumber: p.StreetNumber,
 	}
@@ -41,7 +43,9 @@ func (p *PostedOrder) Order() *database.Order {
 		billingAddress = &database.Address{
 			City:         p.Bcity,
 			PostCode:     p.BpostCode,
-			State:        p.Bstate,
+			State:        &database.State{
+				Name: p.Bstate,
+			},
 			Street:       p.Bstreet,
 			StreetNumber: p.BstreetNumber,
 		}
