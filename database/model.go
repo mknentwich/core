@@ -11,9 +11,16 @@ type Address struct {
 	gorm.Model
 	City         string `json:"city"`
 	PostCode     string `json:"postCode"`
-	State        string `json:"state"`
+	State        *State
+	StateID      *uint  `sql:"type:integer REFERENCES states(id)" json:"-"`
 	Street       string `json:"street"`
 	StreetNumber string `json:"streetNumber"`
+}
+
+type State struct {
+	gorm.Model
+	Name          string  `json:"name"`
+	DeliveryPrice float64 `json:"price"`
 }
 
 type Category struct {
