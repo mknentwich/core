@@ -52,9 +52,15 @@ entity "orders" as ord {
   *payed : datetime
   *reference_count : integer <<nn, uq>>
   *salutation : text
+  *<color:green>items : item[] <<fk, nn>></color>
+  *telephone: text
+}
+
+entity "items" as ite {
+  * **id : integer <<pk, nn, ai>>**
+  --
   *score_amount : integer <<nn>>
   *<color:green>score_id : integer <<fk, nn>></color>
-  *telephone: text
 }
 
 entity "scores" as sco {
@@ -81,8 +87,9 @@ cat |o..|{ cat
 cat |o..|{ sco
 ord }|..|| add
 ord }|..|| add
-sco ||..|{ ord
 sta ||..|{ add
+sco ||..|{ ite
+ite }|..|| ord
 
 @enduml
 ....
