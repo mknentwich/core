@@ -31,9 +31,9 @@ type OrderResultPDF struct {
 type BillingAddress struct {
 	City         string
 	PostCode     string
-	Name         string
 	Street       string
 	StreetNumber string
+	Name         string
 }
 
 //Selects order by ID and serves a result struct for better bill handling

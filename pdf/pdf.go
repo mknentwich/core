@@ -157,12 +157,17 @@ func createBillPdf(address ownAddress, bank bankData) error {
 
 //Paint the Addresses of the Customer
 func loadAddressesCustomer(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
-	var zHd string
 	pdf.SetFontSize(sizeText)
 	pdf.SetX(marginSide)
 	pdf.SetY(marginCustomerAddress)
+
+	if billData.BillingAddress.Street != "" {
+		pdf.SetFontStyle("b")
+		pdf.Cell(cellWidthMax, sizeText, translator("Rechnungsadresse:"))
+		pdf.SetFontStyle("")
+		pdf.Ln(sizeText / 2)
+	}
 	if len(billData.Company) > 0 {
-		zHd = "z.Hd. "
 		pdf.Cell(cellWidthMax, sizeText, translator(billData.Company))
 	} else {
 		if len(billData.Salutation) > 0 {
@@ -170,13 +175,41 @@ func loadAddressesCustomer(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 		}
 	}
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, translator(zHd+billData.FirstName+" "+billData.LastName))
+	pdf.Cell(cellWidthMax, sizeText, translator(billData.FirstName+" "+billData.LastName))
 	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, translator(billData.Street+" "+billData.StreetNumber))
-	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, translator(billData.PostCode+" "+billData.City))
-	pdf.Ln(sizeText / 2)
-	pdf.Cell(cellWidthMax, sizeText, translator(billData.Name))
+	if billData.BillingAddress.Street != "" {
+		//use billing Address first
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.BillingAddress.Street+" "+billData.BillingAddress.StreetNumber))
+		pdf.Ln(sizeText / 2)
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.BillingAddress.PostCode+" "+billData.BillingAddress.City))
+		pdf.Ln(sizeText / 2)
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.BillingAddress.Name))
+		//paint deliveryAddress
+		pdf.SetY(marginCustomerAddress)
+		pdf.SetX(4.5 * marginSide)
+		pdf.SetFontStyle("b")
+		pdf.Cell(cellWidthMax, sizeText, translator("Lieferadresse:"))
+		pdf.SetFontStyle("")
+		pdf.Ln(sizeText / 2)
+		pdf.SetX(4.5 * marginSide)
+		pdf.Cell(cellWidthMax/2, sizeText, translator(billData.FirstName+" "+billData.LastName))
+		pdf.Ln(sizeText / 2)
+		pdf.SetX(4.5 * marginSide)
+		pdf.Cell(cellWidthMax/2, sizeText, translator(billData.Street+" "+billData.StreetNumber))
+		pdf.Ln(sizeText / 2)
+		pdf.SetX(4.5 * marginSide)
+		pdf.Cell(cellWidthMax/2, sizeText, translator(billData.PostCode+" "+billData.City))
+		pdf.Ln(sizeText / 2)
+		pdf.SetX(4.5 * marginSide)
+		pdf.Cell(cellWidthMax/2, sizeText, translator(billData.Name))
+	} else {
+		//use delivery Address only
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.Street+" "+billData.StreetNumber))
+		pdf.Ln(sizeText / 2)
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.PostCode+" "+billData.City))
+		pdf.Ln(sizeText / 2)
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.Name))
+	}
 	return pdf
 }
 

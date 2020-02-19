@@ -105,11 +105,11 @@ func insertTestData() {
 		DeliveryPrice: 7,
 	}
 	address = database.Address{
-		City:         "Hürth",
+		City:         "Leopoldsdorf im wundersc Marchfelde",
 		PostCode:     "50354",
 		State:        &country,
-		Street:       "Kalscheurener Straße",
-		StreetNumber: "89",
+		Street:       "vTg>726X$Do5:x,Yt?qvBh#~Fl'Fy9",
+		StreetNumber: "xx-5ax1",
 	}
 	err := rest.SaveAddress(address)
 	if err != nil {
@@ -129,7 +129,7 @@ func insertTestData() {
 	err = rest.SaveScore(score)
 	order = database.Order{
 		BillingAddress:  &address,
-		Company:         "Millionen Show",
+		Company:         "vTg>726X$Do5:x,Yt?qvBh#~Fl'Fy9bd^SJ",
 		Date:            1568024628000,
 		DeliveryAddress: &address,
 		Email:           "jauch@werwirdswohl.de",
@@ -177,7 +177,16 @@ func insertTestData2() {
 		err.Error()
 	}
 	order = database.Order{
-		BillingAddress:  &address,
+		BillingAddress: &database.Address{
+			City:     "",
+			PostCode: "",
+			State: &database.State{
+				Name:          "",
+				DeliveryPrice: 0,
+			},
+			Street:       "",
+			StreetNumber: "",
+		},
 		Company:         "",
 		Date:            10022018,
 		DeliveryAddress: &address,
@@ -225,13 +234,19 @@ func insertTestData3() {
 		err.Error()
 	}
 	order = database.Order{
-		BillingAddress:  &address,
-		Company:         "",
+		BillingAddress: &database.Address{
+			City:         "Leopoldsdorf im Marchfelde",
+			PostCode:     "2285",
+			State:        &country,
+			Street:       "Kempfendorf",
+			StreetNumber: "2",
+		},
+		Company:         "Musikverein Leopoldsdorf",
 		Date:            20190201,
 		DeliveryAddress: &address,
 		Email:           "e11908080@student.tuwien.ac.at",
 		FirstName:       "Richard",
-		LastName:        "Stëckl",
+		LastName:        "Stöckl",
 		Payed:           true,
 		Salutation:      "Herr",
 		Score:           score,
