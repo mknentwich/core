@@ -14,7 +14,10 @@ import (
 var country database.State
 var address database.Address
 var order database.Order
-var score database.Score
+var score1 database.Score
+var score2 database.Score
+var scoreItem1 database.Item
+var scoreItem2 database.Item
 
 //Starts database service at begin of testing
 func TestMain(m *testing.M) {
@@ -115,7 +118,7 @@ func insertTestData() {
 	if err != nil {
 		err.Error()
 	}
-	score = database.Score{
+	score1 = database.Score{
 		Category: &database.Category{
 			Name: "Polka",
 		},
@@ -123,10 +126,30 @@ func insertTestData() {
 		Price:      39.9,
 		Title:      "Eine letzte Runde (Blasorchesterfassung)",
 	}
+	score2 = database.Score{
+		Category: &database.Category{
+			Name: "Märsche",
+		},
+		Difficulty: 4,
+		Price:      19.9,
+		Title:      "Florentiner Marsch",
+	}
+	err = rest.SaveScore(score1)
 	if err != nil {
 		err.Error()
 	}
-	err = rest.SaveScore(score)
+	err = rest.SaveScore(score2)
+	if err != nil {
+		err.Error()
+	}
+	scoreItem1 = database.Item{
+		Score:       &score1,
+		ScoreAmount: 2,
+	}
+	scoreItem2 = database.Item{
+		Score:       &score2,
+		ScoreAmount: 1,
+	}
 	order = database.Order{
 		BillingAddress:  &address,
 		Company:         "vTg>726X$Do5:x,Yt?qvBh#~Fl'Fy9bd^SJ",
@@ -137,8 +160,7 @@ func insertTestData() {
 		LastName:        "Jauch",
 		Payed:           false,
 		Salutation:      "Herr",
-		Score:           score,
-		ScoreAmount:     3,
+		Items:           []*database.Item{&scoreItem1, &scoreItem2},
 		Telephone:       "+4954783907",
 	}
 	err = rest.SaveOrder(order)
@@ -164,7 +186,7 @@ func insertTestData2() {
 	if err != nil {
 		err.Error()
 	}
-	score = database.Score{
+	score1 = database.Score{
 		Category: &database.Category{
 			Name: "Polka",
 		},
@@ -172,9 +194,29 @@ func insertTestData2() {
 		Price:      24.37,
 		Title:      "Über den (Netzwerk)Brücken (Wiener Linien Fassung)",
 	}
-	err = rest.SaveScore(score)
+	score2 = database.Score{
+		Category: &database.Category{
+			Name: "Märsche",
+		},
+		Difficulty: 4,
+		Price:      19.9,
+		Title:      "Florentiner Marsch",
+	}
+	err = rest.SaveScore(score1)
 	if err != nil {
 		err.Error()
+	}
+	err = rest.SaveScore(score2)
+	if err != nil {
+		err.Error()
+	}
+	scoreItem1 = database.Item{
+		Score:       &score1,
+		ScoreAmount: 1,
+	}
+	scoreItem2 = database.Item{
+		Score:       &score2,
+		ScoreAmount: 1,
 	}
 	order = database.Order{
 		BillingAddress: &database.Address{
@@ -195,8 +237,7 @@ func insertTestData2() {
 		LastName:        "Berger",
 		Payed:           true,
 		Salutation:      "Herr",
-		Score:           score,
-		ScoreAmount:     1,
+		Items:           []*database.Item{&scoreItem1, &scoreItem2},
 		Telephone:       "",
 	}
 	err = rest.SaveOrder(order)
@@ -221,7 +262,7 @@ func insertTestData3() {
 	if err != nil {
 		err.Error()
 	}
-	score = database.Score{
+	score1 = database.Score{
 		Category: &database.Category{
 			Name: "Marsch",
 		},
@@ -229,9 +270,29 @@ func insertTestData3() {
 		Price:      24.37,
 		Title:      "Arnheim Marsch",
 	}
-	err = rest.SaveScore(score)
+	score2 = database.Score{
+		Category: &database.Category{
+			Name: "Märsche",
+		},
+		Difficulty: 4,
+		Price:      19.9,
+		Title:      "Florentiner Marsch",
+	}
+	err = rest.SaveScore(score1)
 	if err != nil {
 		err.Error()
+	}
+	err = rest.SaveScore(score2)
+	if err != nil {
+		err.Error()
+	}
+	scoreItem1 = database.Item{
+		Score:       &score1,
+		ScoreAmount: 3,
+	}
+	scoreItem2 = database.Item{
+		Score:       &score2,
+		ScoreAmount: 4,
 	}
 	order = database.Order{
 		BillingAddress: &database.Address{
@@ -249,8 +310,7 @@ func insertTestData3() {
 		LastName:        "Stöckl",
 		Payed:           true,
 		Salutation:      "Herr",
-		Score:           score,
-		ScoreAmount:     1,
+		Items:           []*database.Item{&scoreItem1, &scoreItem2},
 		Telephone:       "",
 	}
 	err = rest.SaveOrder(order)
