@@ -5,7 +5,6 @@ import (
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/utils"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -59,7 +58,8 @@ func postOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	f := r.PostForm
-	scoreId, err := strconv.ParseUint(f.Get("scoreId"), 10, 64)
+	//TODO: What the fuck is going on here and how can i use this?
+	//scoreId, err := strconv.ParseUint(f.Get("scoreId"), 10, 64)
 	if err != nil {
 		rw.WriteHeader(http.StatusUnprocessableEntity)
 		return
@@ -73,7 +73,7 @@ func postOrder(rw http.ResponseWriter, r *http.Request) {
 		BstreetNumber:  f.Get("bstreetNumber"),
 		City:           f.Get("city"),
 		PostCode:       f.Get("postCode"),
-		ScoreId:        uint(scoreId),
+		Scores:         f.Get("scoreItems"),
 		State:          f.Get("state"),
 		Street:         f.Get("street"),
 		StreetNumber:   f.Get("streetNumber"),

@@ -215,7 +215,8 @@ func loadAddressesCustomer(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 
 //Paint articles to the pdf, returns total price
 func loadArticles(pdf *gofpdf.Fpdf) float64 {
-	price := float64(billData.ScoreAmount) * billData.Price
+	//TODO: load all articles and change the layout if necessary
+	/*price := float64(billData.ScoreAmount) * billData.Price
 	pdf.SetX(marginSide)
 	pdf.SetY(marginArticles)
 	pdf.SetFontStyle("b")
@@ -242,7 +243,8 @@ func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	pdf.SetFontStyle("")
 	//Load no taxes sentence
 	pdf.CellFormat(cellWidthMax, sizeText, translator(sentenceNoTaxes), "", 0, "C", false, 0, "")
-	return price
+	return price*/
+	return 0
 }
 
 //Paint data of the bank connection

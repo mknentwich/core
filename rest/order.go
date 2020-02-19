@@ -14,7 +14,7 @@ type PostedOrder struct {
 	BstreetNumber  string
 	City           string
 	PostCode       string
-	ScoreId        uint
+	Scores         string
 	State          string
 	Street         string
 	StreetNumber   string
@@ -28,9 +28,9 @@ type PostedOrder struct {
 
 func (p *PostedOrder) Order() *database.Order {
 	address := &database.Address{
-		City:         p.City,
-		PostCode:     p.PostCode,
-		State:        &database.State{
+		City:     p.City,
+		PostCode: p.PostCode,
+		State: &database.State{
 			Name: p.State,
 		},
 		Street:       p.Street,
@@ -41,15 +41,20 @@ func (p *PostedOrder) Order() *database.Order {
 		billingAddress = address
 	} else {
 		billingAddress = &database.Address{
-			City:         p.Bcity,
-			PostCode:     p.BpostCode,
-			State:        &database.State{
+			City:     p.Bcity,
+			PostCode: p.BpostCode,
+			State: &database.State{
 				Name: p.Bstate,
 			},
 			Street:       p.Bstreet,
 			StreetNumber: p.BstreetNumber,
 		}
 	}
+	//TODO: Extract Strings from Post
+	/*scoreItem := database.Item{
+		ScoreID:     p.ScoreID,
+		ScoreAmount: p.ScoreAmount,
+	}*/
 	now := time.Now()
 	order := &database.Order{
 		BillingAddress:  billingAddress,
@@ -62,8 +67,7 @@ func (p *PostedOrder) Order() *database.Order {
 		Payed:           false,
 		ReferenceCount:  0,
 		Salutation:      p.Salutation,
-		ScoreID:         p.ScoreId,
-		ScoreAmount:     1,
+		Items:           []*database.Item{},
 		Telephone:       p.Telephone,
 	}
 	return order
