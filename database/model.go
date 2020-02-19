@@ -41,6 +41,14 @@ type Score struct {
 	Title      string  `json:"title"`
 }
 
+type Item struct {
+	gorm.Model
+	OrderID     uint `sql:"type:integer REFERENCES orders(id)" json:"-"`
+	Score       *Score
+	ScoreID     *uint `sql:"type:integer REFERENCES scores(id)" json:"-"`
+	ScoreAmount int   `json:"scoreAmount"`
+}
+
 type Order struct {
 	gorm.Model
 	BillingAddress    *Address `json:"billingAddress"`
@@ -56,9 +64,7 @@ type Order struct {
 	Payed             bool     `json:"payed"`
 	ReferenceCount    int      `json:"referenceCount"`
 	Salutation        string   `json:"salutation"`
-	Score             Score    `json:"score"`
-	ScoreID           uint     `sql:"type:integer REFERENCES scores(id)" json:"scoreId"`
-	ScoreAmount       int      `json:"scoreAmount"`
+	Items             []*Item  `gorm:"foreignkey:OrderID" json:"items"`
 	Telephone         string   `json:"telephone"`
 }
 
