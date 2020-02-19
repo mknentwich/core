@@ -71,6 +71,22 @@ func InsertTestData() {
 		StreetNumber: "89",
 	}
 	t, _ := time.Parse(time.RFC822, "01 Jan 15 10:00 UTC")
+	score1 := database.Score{
+		Category: &database.Category{
+			Name: "Marsch",
+		},
+		Difficulty: 1,
+		Price:      24.37,
+		Title:      "Arnheim Marsch",
+	}
+	score2 := database.Score{
+		Category: &database.Category{
+			Name: "Märsche",
+		},
+		Difficulty: 4,
+		Price:      19.9,
+		Title:      "Florentiner Marsch",
+	}
 	orders := []database.Order{
 		{
 			BillingAddress:  &adr,
@@ -82,16 +98,17 @@ func InsertTestData() {
 			LastName:        "Jauch",
 			Payed:           false,
 			Salutation:      "Herr",
-			Score: database.Score{
-				Difficulty: 3,
-				Price:      39.9,
-				Title:      "Eine letzte Runde (Blasorchesterfassung)",
-				Category: &database.Category{
-					Name: "Polka",
+			Items: []*database.Item{
+				{
+					Score:       &score1,
+					ScoreAmount: 2,
+				},
+				{
+					Score:       &score2,
+					ScoreAmount: 1,
 				},
 			},
-			ScoreAmount: 3,
-			Telephone:   "",
+			Telephone: "",
 		},
 	}
 	for _, v := range orders {
