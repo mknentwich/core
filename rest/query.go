@@ -27,20 +27,6 @@ func QueryOrders(payed bool) []database.Order {
 	return orders
 }
 
-//Finds the highest referenceCount value from the orders table
-func FindMaxReferenceCount() int {
-	var max int
-	row := database.Receive().Table("orders").Select("MAX(reference_count)").Row()
-	row.Scan(&max)
-	return max
-}
-
-//Inserts new address to the database
-func InsertNewAddress(address database.Address) error {
-	err := database.Receive().Create(&address).Error
-	return err
-}
-
 //Inserts or updates a address to the database
 func SaveAddress(address database.Address) error {
 	err := database.Receive().Save(&address).Error
