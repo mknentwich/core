@@ -20,9 +20,7 @@ type OrderResultPDF struct {
 	FirstName      string
 	LastName       string
 	Salutation     string
-	ScoreAmount    int
-	Title          string
-	Price          float64
+	ScoreItems     []*ScoreItems
 	ReferenceCount int
 	BillingDate    int
 }
@@ -36,15 +34,22 @@ type BillingAddress struct {
 	Name         string
 }
 
+//Contains scores for the OrderResultPDF
+type ScoreItems struct {
+	Title       string
+	Price       float64
+	ScoreAmount int
+}
+
 //Selects order by ID and serves a result struct for better bill handling
 //The billingAddress is queried separately, as the whole sql query can't be done in one part
 func QueryOrderFromIdForPDF(id int) (OrderResultPDF, error) {
 	var pdfOrderResult OrderResultPDF
 	var billing BillingAddress
+	var scoreItems []*ScoreItems
 	recordNotFound := database.Receive().Table("orders").Select("city, post_code, street, street_number, name, delivery_price, "+
-		"orders.id, orders.company, orders.date, orders.first_name, orders.last_name, orders.salutation, orders.score_amount, orders.reference_count, orders.billing_date, scores.title, scores.price").
+		"orders.id, orders.company, orders.date, orders.first_name, orders.last_name, orders.salutation, orders.reference_count, orders.billing_date").
 		Joins("inner join addresses on orders.delivery_address_id = addresses.id").
-		Joins("inner join scores on orders.score_id = scores.id").
 		Joins("JOIN states on states.id = addresses.state_id").
 		Where("orders.id = ?", id).
 		Find(&pdfOrderResult).Scan(&pdfOrderResult).RecordNotFound()
@@ -59,6 +64,14 @@ func QueryOrderFromIdForPDF(id int) (OrderResultPDF, error) {
 	if recordNotFound {
 		return pdfOrderResult, errors.New("QueryOrderFromIdForPDF: Record with orderID not found")
 	}
+	recordNotFound = database.Receive().Table("items").Select("items.score_amount, scores.title, scores.price").
+		Joins("inner join scores on items.score_id = scores.id").
+		Where("items.order_id = ?", id).
+		Find(&scoreItems).Scan(&scoreItems).RecordNotFound()
+	if recordNotFound {
+		return pdfOrderResult, errors.New("QueryOrderFromIdForPDF: Record with orderID not found")
+	}
 	pdfOrderResult.BillingAddress = &billing
+	pdfOrderResult.ScoreItems = scoreItems
 	return pdfOrderResult, nil
 }
