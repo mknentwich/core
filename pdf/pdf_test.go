@@ -5,11 +5,13 @@ import (
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
 	"github.com/mknentwich/core/rest"
+	"io"
 	"net/http"
 	"os"
 	"testing"
 )
 
+var country database.State
 var address database.Address
 var order database.Order
 var score database.Score
@@ -63,56 +65,51 @@ func TestPDF(t *testing.T) {
 		}
 	})
 	t.Run("PDFCreationFromTestData", func(t *testing.T) {
-		f, err := os.OpenFile("example-bill-company.pdf", os.O_RDWR|os.O_CREATE, 0600)
-		if err != nil {
-			t.Errorf("Error on creating the bill pdf: %s", err.Error())
-		}
-		write, _, err := GeneratePDF(1)
+		reader, filename, err := GeneratePDF(1)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
 		}
-		err = write(f)
+		f, err := os.OpenFile("Rechnung_"+filename+".pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		f, err = os.OpenFile("example-bill-customer.pdf", os.O_RDWR|os.O_CREATE, 0600)
-		if err != nil {
-			t.Errorf("Error on creating the bill pdf: %s", err.Error())
-		}
-		write, _, err = GeneratePDF(2)
+		io.Copy(f, reader)
+		reader, filename, err = GeneratePDF(2)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
 		}
-		err = write(f)
+		f, err = os.OpenFile("Rechnung_"+filename+".pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
-		f, err = os.OpenFile("example-bill-customer2.pdf", os.O_RDWR|os.O_CREATE, 0600)
-		if err != nil {
-			t.Errorf("Error on creating the bill pdf: %s", err.Error())
-		}
-		write, _, err = GeneratePDF(3)
+		io.Copy(f, reader)
+		reader, filename, err = GeneratePDF(3)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 			return
 		}
-		err = write(f)
+		f, err = os.OpenFile("Rechnung_"+filename+".pdf", os.O_RDWR|os.O_CREATE, 0600)
 		if err != nil {
 			t.Errorf("Error on creating the bill pdf: %s", err.Error())
 		}
+		io.Copy(f, reader)
 	})
 }
 
 //Inserts TestData to the Database
 func insertTestData() {
+	country = database.State{
+		Name:          "Deutschland",
+		DeliveryPrice: 7,
+	}
 	address = database.Address{
-		City:         "Hürth",
+		City:         "Leopoldsdorf im wundersc Marchfelde",
 		PostCode:     "50354",
-		State:        "Deutschland",
-		Street:       "Kalscheurener Straße",
-		StreetNumber: "89",
+		State:        &country,
+		Street:       "vTg>726X$Do5:x,Yt?qvBh#~Fl'Fy9",
+		StreetNumber: "xx-5ax1",
 	}
 	err := rest.SaveAddress(address)
 	if err != nil {
@@ -131,10 +128,10 @@ func insertTestData() {
 	}
 	err = rest.SaveScore(score)
 	order = database.Order{
-		BillingAddress:  address,
-		Company:         "Millionen Show",
+		BillingAddress:  &address,
+		Company:         "vTg>726X$Do5:x,Yt?qvBh#~Fl'Fy9bd^SJ",
 		Date:            1568024628000,
-		DeliveryAddress: address,
+		DeliveryAddress: &address,
 		Email:           "jauch@werwirdswohl.de",
 		FirstName:       "Günter",
 		LastName:        "Jauch",
@@ -152,10 +149,14 @@ func insertTestData() {
 
 //Inserts TestData to the Database
 func insertTestData2() {
+	country = database.State{
+		Name:          "Österreich",
+		DeliveryPrice: 3,
+	}
 	address = database.Address{
 		City:         "Wien",
 		PostCode:     "1050",
-		State:        "Österreich",
+		State:        &country,
 		Street:       "Spengergasse",
 		StreetNumber: "20",
 	}
@@ -176,10 +177,19 @@ func insertTestData2() {
 		err.Error()
 	}
 	order = database.Order{
-		BillingAddress:  address,
+		BillingAddress: &database.Address{
+			City:     "",
+			PostCode: "",
+			State: &database.State{
+				Name:          "",
+				DeliveryPrice: 0,
+			},
+			Street:       "",
+			StreetNumber: "",
+		},
 		Company:         "",
 		Date:            10022018,
-		DeliveryAddress: address,
+		DeliveryAddress: &address,
 		Email:           "hpberger@spengergasse.at",
 		FirstName:       "Hans-Peter",
 		LastName:        "Berger",
@@ -196,10 +206,14 @@ func insertTestData2() {
 }
 
 func insertTestData3() {
+	country = database.State{
+		Name:          "Österreich",
+		DeliveryPrice: 3,
+	}
 	address = database.Address{
 		City:         "Leopoldsdorf im Marchfelde",
 		PostCode:     "2285",
-		State:        "Österreich",
+		State:        &country,
 		Street:       "Leopold-Figl-Gasse",
 		StreetNumber: "2c",
 	}
@@ -220,13 +234,19 @@ func insertTestData3() {
 		err.Error()
 	}
 	order = database.Order{
-		BillingAddress:  address,
-		Company:         "",
+		BillingAddress: &database.Address{
+			City:         "Leopoldsdorf im Marchfelde",
+			PostCode:     "2285",
+			State:        &country,
+			Street:       "Kempfendorf",
+			StreetNumber: "2",
+		},
+		Company:         "Musikverein Leopoldsdorf",
 		Date:            20190201,
-		DeliveryAddress: address,
+		DeliveryAddress: &address,
 		Email:           "e11908080@student.tuwien.ac.at",
 		FirstName:       "Richard",
-		LastName:        "Stëckl",
+		LastName:        "Stöckl",
 		Payed:           true,
 		Salutation:      "Herr",
 		Score:           score,

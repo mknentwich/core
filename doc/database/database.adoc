@@ -19,9 +19,16 @@ entity "addresses" as add {
   --
   *city : text <<nn>>
   *post_code : text <<nn>>
-  *state : text <<nn>>
+  *<color:green>state_id : integer <<fk, nn>></color>
   *street : text <<nn>>
   *street_number : text <<nn>>
+}
+
+entity "state" as sta {
+  * **id : integer <<pk, nn, ai>>**
+  --
+  *name : text <<nn, uq>>
+  *deliveryPrice : real <<nn>>
 }
 
 entity "categories" as cat {
@@ -35,6 +42,7 @@ entity "orders" as ord {
   * **id : integer <<pk, nn, ai>>**
   --
   *<color:green>billing_address_id : integer <<fk>></color>
+  *billing_date : datetime
   *company : text
   *date : datetime <<nn, uq>>
   *<color:green>delivery_address_id : integer <<fk, nn>></color>
@@ -42,11 +50,10 @@ entity "orders" as ord {
   *first_name : text <<nn>>
   *last_name :  text <<nn>>
   *payed : datetime
-  *billing_date : datetime
   *reference_count : integer <<nn, uq>>
   *salutation : text
   *score_amount : integer <<nn>>
-  *<color:green>score_id : integer <<nn>></color>
+  *<color:green>score_id : integer <<fk, nn>></color>
   *telephone: text
 }
 
@@ -56,7 +63,7 @@ entity "scores" as sco {
   *title : text <<nn>>
   *price : real <<nn>>
   *difficulty : integer <<nn>>
-  *<color:green>category_id : integer <<fk>></color>
+  *<color:green>category_id : integer <<fk, nn>></color>
 }
 
 entity "users" {
@@ -75,6 +82,7 @@ cat |o..|{ sco
 ord }|..|| add
 ord }|..|| add
 sco ||..|{ ord
+sta ||..|{ add
 
 @enduml
 ....

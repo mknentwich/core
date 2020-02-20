@@ -5,6 +5,7 @@ import (
 	"github.com/mknentwich/core/auth"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/utils"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -45,14 +46,14 @@ func httpOrder(rw http.ResponseWriter, r *http.Request) {
 
 func httpOrderGet(rw http.ResponseWriter, r *http.Request, orderId int) {
 	log(context.LOG_INFO, "requested order with id: %d", orderId)
-	billWriter, filename, err := GeneratePDF(orderId)
+	billReader, filename, err := GeneratePDF(orderId)
 	rw.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	if err != nil {
 		rw.WriteHeader(http.StatusNotFound)
 		log(context.LOG_ERROR, "error while creating bill pdf: %d", err.Error())
 		return
 	}
-	err = billWriter(rw)
+	_,err = io.Copy(rw, billReader)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		log(context.LOG_ERROR, "error while creating bill pdf: %d", err.Error())
