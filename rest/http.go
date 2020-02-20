@@ -12,14 +12,18 @@ import (
 //Logging function for this package.
 var log context.Log
 
+var outDir string
+
 //Serve function for this package.
 func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	log = args.Log
+	outDir = args.GeneratedDirectory
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", utils.HttpImplement(log))
 	mux.HandleFunc("/categories", utils.Rest(flat(get(QueryCategoriesFlat), get(QueryCategoriesWithChildrenAndScores))))
 	mux.HandleFunc("/order", utils.Cors(postOrder))
 	mux.HandleFunc("/scores", utils.Rest(get(QueryScoresFlat)))
+	worker()
 	return context.ServiceResult{HttpHandler: mux}, initializeTemplates()
 }
 
