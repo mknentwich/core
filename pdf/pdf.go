@@ -46,6 +46,9 @@ type bankData struct {
 	price      float64
 }
 
+//amount, where a free delivery is granted to an order
+var freeDelivery = 99.0
+
 //Buffer, where PDF stream will be loaded into
 var result bytes.Buffer
 
@@ -214,6 +217,7 @@ func loadAddressesCustomer(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 }
 
 //Paint articles to the pdf, returns total price
+//Checks, if free delivery is granted to this order
 func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	//TODO: load all articles and change the layout if necessary
 	/*price := float64(billData.ScoreAmount) * billData.Price
@@ -233,8 +237,12 @@ func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	pdf.CellFormat(cellWidthMax/9, sizeText, "", "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*5, sizeText, translator("Versand ("+billData.Name+")"), "B", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, "", "B", 0, "R", false, 0, "")
-	pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", billData.DeliveryPrice)+" €"), "B", 1, "R", false, 0, "")
-	price += billData.DeliveryPrice
+	if price >= freeDelivery {
+		pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator("0.00 €"), "B", 1, "R", false, 0, "")
+	} else {
+		pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", billData.DeliveryPrice)+" €"), "B", 1, "R", false, 0, "")
+		price += billData.DeliveryPrice
+	}
 	pdf.SetFontStyle("b")
 	pdf.CellFormat(cellWidthMax/9, sizeText, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(cellWidthMax/9*5, sizeText, "", "", 0, "", false, 0, "")

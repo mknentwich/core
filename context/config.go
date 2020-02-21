@@ -23,6 +23,7 @@ type Configuration struct {
 	SQLiteFile           string           `json:"sqliteFile"`
 	Mail                 EmailCredentials `json:"mail"`
 	OrderRetrievers      []*mail.Address  `json:"orderRetrievers"`
+	RestMirror           RestMirror       `json:"restMirror"`
 	TemplateInterval     uint             `json:"templateInterval"`
 }
 
@@ -67,11 +68,25 @@ func defaultConf() *Configuration {
 		JWTSecret:            fmt.Sprintf("%x", secret),
 		SQLiteFile:           "core.sqlite",
 		TemplateInterval:     5,
+		RestMirror: RestMirror{
+			Interval:           5,
+			CategoriesPath:     "categories.json",
+			CategoriesFlatPath: "categoriesflat.json",
+			ScoresPath:         "scores.json",
+		},
 		OrderRetrievers: []*mail.Address{
 			{
 				Name:    "Max Mustermann",
 				Address: "max.mustermann@mail.example.org",
 			}}}
+}
+
+//section for the rest mirror
+type RestMirror struct {
+	Interval           uint   `json:"interval"`
+	CategoriesPath     string `json:"categoriesPath"`
+	CategoriesFlatPath string `json:"categoriesFlatPath"`
+	ScoresPath         string `json:"scoresPath"`
 }
 
 //Reads configuration from file and creates one if it does not exist yet.
