@@ -250,7 +250,7 @@ func insertTestData3() {
 		Payed:           true,
 		Salutation:      "Herr",
 		Score:           score,
-		ScoreAmount:     1,
+		ScoreAmount:     2,
 		Telephone:       "",
 	}
 	err = rest.SaveOrder(order)
