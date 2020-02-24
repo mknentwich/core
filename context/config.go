@@ -22,6 +22,7 @@ type Configuration struct {
 	JWTSecret            string           `json:"jwtSecret"`
 	SQLiteFile           string           `json:"sqliteFile"`
 	Mail                 EmailCredentials `json:"mail"`
+	OrderRefer           OrderRefer       `json:"orderRefer"`
 	OrderRetrievers      []*mail.Address  `json:"orderRetrievers"`
 	RestMirror           RestMirror       `json:"restMirror"`
 	TemplateInterval     uint             `json:"templateInterval"`
@@ -40,6 +41,13 @@ type EmailCredentials struct {
 	Password string        `json:"password"`
 	SMTPHost string        `json:"smtpHost"`
 	Address  *mail.Address `json:"address"`
+}
+
+//Struct for refers after order
+type OrderRefer struct {
+	Host    string `json:"host"`
+	Fail    string `json:"fail"`
+	Success string `json:"success"`
 }
 
 //Returns a default configuration with a generated jwt secret.
@@ -73,6 +81,11 @@ func defaultConf() *Configuration {
 			CategoriesPath:     "categories.json",
 			CategoriesFlatPath: "categoriesflat.json",
 			ScoresPath:         "scores.json",
+		},
+		OrderRefer: OrderRefer{
+			Host:    "http://localhost:1313",
+			Fail:    "/orderfailed",
+			Success: "/ordered",
 		},
 		OrderRetrievers: []*mail.Address{
 			{

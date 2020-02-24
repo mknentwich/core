@@ -91,6 +91,9 @@ func postOrder(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		log(context.LOG_ERROR, "error occurred while persisting a new order: %s", err.Error())
+		http.Redirect(rw, r, context.Conf.OrderRefer.Host+context.Conf.OrderRefer.Fail, http.StatusMovedPermanently)
+	} else {
+		http.Redirect(rw, r, context.Conf.OrderRefer.Host+context.Conf.OrderRefer.Success, http.StatusMovedPermanently)
 	}
 	err = notify(order)
 	if err != nil {
