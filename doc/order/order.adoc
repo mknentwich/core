@@ -44,18 +44,17 @@ The first step which is required to create a new order is to send a `POST` to `{
 [cols="a,a,a,a"]
 |===
 |Name|Description|Type|Required
-|`addressesEqual`|`true` if billing and delivery addresses are the equal|`bool`|{chck}
-|`bcity`|Billing city|`string` 1.5+|{nch} only needed if billing address is different from delivery address
-|`bpostCode`|Billing post code|`string`
-|`bstate`|Billing state|`string`
-|`bstreet`|Billing street|`string`
-|`bstreetNumber`|Billing street number|`string`
-|`city`|Delivery city|`string`|{chck}
-|`postCode`|Delivery post code|`string`|{chck}
+|`dcity`|Delivery city|`string` 1.5+|{nch} only needed if billing address is different from delivery address
+|`dpostCode`|Delivery post code|`string`
+|`dstate`|Delivery state|`string`
+|`dstreet`|Delivery street|`string`
+|`dstreetNumber`|Delivery street number|`string`
+|`city`|Billing city|`string`|{chck}
+|`postCode`|Billing post code|`string`|{chck}
 |`scoreId`|Score which was ordered|`number`|{chck}
-|`state`|Delivery state|`string`|{chck}
-|`street`|Delivery street|`string`|{chck}
-|`streetNumber`|Delivery street number|`string`|{chck}
+|`state`|Billing state|`string`|{chck}
+|`street`|Billing street|`string`|{chck}
+|`streetNumber`|Billing street number|`string`|{chck}
 |`company`|Company/Music Society/Band|`string`|{nch}
 |`email`|Email of the issuer|`string`|{chck}
 |`firstName`|First name of the issuer|`string`|{chck}
@@ -63,6 +62,9 @@ The first step which is required to create a new order is to send a `POST` to `{
 |`salutation`|Salutation of the issuer|`string`|{chck}
 |`telephone`|Phone number of the issuer|`string`|{nch}
 |===
+
+NOTE: The delivery address is optional.
+If it is not given, the billing address is valid for both.
 
 If the request was successful, certain things will happen:
 
