@@ -7,3 +7,5 @@ Every package is meant to be, to has its own configuration which is included in 
 ----
 include::code/config.schema.json[]
 ----
+
+TIP: The config file structure and basic constraints can be validated with `jsonschema -i config.json doc/config/code/config.schema.json`

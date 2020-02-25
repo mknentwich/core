@@ -2,24 +2,123 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "config",
   "type": "object",
+  "definitions": {
+    "email": {
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Address": {
+          "type": "string"
+        }
+      }
+    }
+  },
   "properties": {
+    "authentication": {
+      "type": "boolean"
+    },
+    "davPaths": {
+      "type": "object",
+      "properties": {
+        "payedBills": {
+          "type": "string"
+        },
+        "unpayedBills": {
+          "type": "string"
+        },
+        "scores": {
+          "type": "string"
+        }
+      }
+    },
+    "generatedDirectory": {
+      "type": "string"
+    },
     "host": {
       "type": "string"
     },
     "jwtExpirationMinutes": {
-      "type": "number"
+      "type": "number",
+      "minimum": 0
     },
     "jwtSecret": {
       "type": "string"
     },
+    "mail": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "smtpHost": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/email"
+        }
+      }
+    },
+    "orderRefer": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "fail": {
+          "type": "string"
+        },
+        "success": {
+          "type": "string"
+        }
+      }
+    },
+    "orderRetrievers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/email"
+      }
+    },
+    "restMirror": {
+      "type": "object",
+      "properties": {
+        "interval": {
+          "type": "number",
+          "minimum": 0
+        },
+        "categoriesPath": {
+          "type": "string"
+        },
+        "categoriesFlatPath": {
+          "type": "string"
+        },
+        "scoresPath": {
+          "type": "string"
+        }
+      }
+    },
     "sqliteFile": {
       "type": "string"
+    },
+    "templateInterval": {
+      "type": "number",
+      "minimum": 0
     }
   },
   "required": [
+    "authentication",
+    "davPaths",
+    "generatedDirectory",
     "host",
     "jwtExpirationMinutes",
     "jwtSecret",
+    "mail",
+    "orderRefer",
+    "orderRetrievers",
+    "restMirror",
     "sqliteFile"
   ]
 }
