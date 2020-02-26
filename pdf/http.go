@@ -18,7 +18,6 @@ var log context.Log
 func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	log = args.Log
 	mux := http.NewServeMux()
-	//TODO wrap order with `Auth`
 	mux.HandleFunc("/order/", auth.Auth(pdfHeader(httpOrder)))
 	return context.ServiceResult{HttpHandler: mux}, nil
 }
@@ -53,7 +52,7 @@ func httpOrderGet(rw http.ResponseWriter, r *http.Request, orderId int) {
 		log(context.LOG_ERROR, "error while creating bill pdf: %d", err.Error())
 		return
 	}
-	_,err = io.Copy(rw, billReader)
+	_, err = io.Copy(rw, billReader)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		log(context.LOG_ERROR, "error while creating bill pdf: %d", err.Error())
