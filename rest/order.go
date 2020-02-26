@@ -6,52 +6,50 @@ import (
 )
 
 type PostedOrder struct {
-	AddressesEqual bool
-	Bcity          string
-	BpostCode      string
-	Bstate         string
-	Bstreet        string
-	BstreetNumber  string
-	City           string
-	PostCode       string
-	ScoreId        uint
-	State          string
-	Street         string
-	StreetNumber   string
-	Company        string
-	Email          string
-	FirstName      string
-	LastName       string
-	Salutation     string
-	Telephone      string
+	Dcity         string
+	DpostCode     string
+	Dstate        string
+	Dstreet       string
+	DstreetNumber string
+	City          string
+	PostCode      string
+	ScoreId       uint
+	State         string
+	Street        string
+	StreetNumber  string
+	Company       string
+	Email         string
+	FirstName     string
+	LastName      string
+	Salutation    string
+	Telephone     string
 }
 
 func (p *PostedOrder) Order() *database.Order {
 	address := &database.Address{
-		City:         p.City,
-		PostCode:     p.PostCode,
-		State:        p.State,
+		City:     p.City,
+		PostCode: p.PostCode,
+		State: &database.State{
+			Name: p.State,
+		},
 		Street:       p.Street,
 		StreetNumber: p.StreetNumber,
 	}
-	var billingAddress *database.Address
-	if p.AddressesEqual {
-		billingAddress = address
-	} else {
-		billingAddress = &database.Address{
-			City:         p.Bcity,
-			PostCode:     p.BpostCode,
-			State:        p.Bstate,
-			Street:       p.Bstreet,
-			StreetNumber: p.BstreetNumber,
-		}
+	deliveryAddress := &database.Address{
+		City:     p.Dcity,
+		PostCode: p.DpostCode,
+		State: &database.State{
+			Name: p.Dstate,
+		},
+		Street:       p.Dstreet,
+		StreetNumber: p.DstreetNumber,
 	}
 	now := time.Now()
 	order := &database.Order{
-		BillingAddress:  billingAddress,
+		BillingAddress:  address,
 		Company:         p.Company,
 		Date:            now.Unix(),
-		DeliveryAddress: address,
+		DeliveryAddress: deliveryAddress,
 		Email:           p.Email,
 		FirstName:       p.FirstName,
 		LastName:        p.LastName,

@@ -1,16 +1,26 @@
 package database
 
 import (
+	"database/sql"
 	"github.com/jinzhu/gorm"
+	"strconv"
+	"time"
 )
 
 type Address struct {
 	gorm.Model
 	City         string `json:"city"`
 	PostCode     string `json:"postCode"`
-	State        string `json:"state"`
+	State        *State
+	StateID      *uint  `sql:"type:integer REFERENCES states(id)" json:"-"`
 	Street       string `json:"street"`
 	StreetNumber string `json:"streetNumber"`
+}
+
+type State struct {
+	gorm.Model
+	Name          string  `json:"name"`
+	DeliveryPrice float64 `json:"deliveryPrice"`
 }
 
 type Category struct {
@@ -64,4 +74,32 @@ type UserWithoutPassword struct {
 	Name       string `json:"name"`
 	LastChange int    `json:"lastChange"`
 	LastLogin  int    `json:"lastLogin"`
+}
+
+//Hook for generating BillingDate and ReferenceCount before Order is saved to the database
+func (order *Order) BeforeSave(db *gorm.DB) (err error) {
+	if order.ReferenceCount == 0 && order.BillingDate == 0 {
+		maxRef := 0
+		now := time.Now()
+		fTime, err := strconv.Atoi(now.Format("20060102"))
+		if err != nil {
+			return err
+		}
+		var s sql.NullString
+		row := db.Table("orders").Select("max(reference_count)").Where("billing_date = ?", &fTime).Row()
+		err = row.Scan(&s)
+		if err != nil {
+			return err
+		}
+		if s.Valid {
+			maxRef, err = strconv.Atoi(s.String)
+			if err != nil {
+				return err
+			}
+		}
+		maxRef++
+		order.BillingDate = int64(fTime)
+		order.ReferenceCount = maxRef
+	}
+	return
 }

@@ -59,10 +59,14 @@ func InsertTestData() {
 					Title: "Gute Nacht",
 					Price: 33}},
 		}}
+	state := database.State{
+		Name:          "Deutschland",
+		DeliveryPrice: 7,
+	}
 	adr := database.Address{
 		City:         "Hürth",
 		PostCode:     "50354",
-		State:        "Deutschland",
+		State:        &state,
 		Street:       "Kalscheurener Straße",
 		StreetNumber: "89",
 	}

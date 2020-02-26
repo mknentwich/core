@@ -6,20 +6,23 @@ import (
 	"github.com/mknentwich/core/utils"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 //Logging function for this package.
 var log context.Log
 
+var outDir string
+
 //Serve function for this package.
 func Serve(args context.ServiceArguments) (context.ServiceResult, error) {
 	log = args.Log
+	outDir = args.GeneratedDirectory
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", utils.HttpImplement(log))
 	mux.HandleFunc("/categories", utils.Rest(flat(get(QueryCategoriesFlat), get(QueryCategoriesWithChildrenAndScores))))
 	mux.HandleFunc("/order", utils.Cors(postOrder))
 	mux.HandleFunc("/scores", utils.Rest(get(QueryScoresFlat)))
+	worker()
 	return context.ServiceResult{HttpHandler: mux}, initializeTemplates()
 }
 
@@ -65,30 +68,32 @@ func postOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	o := PostedOrder{
-		AddressesEqual: strings.ToLower(f.Get("addressesEqual")) == "on",
-		Bcity:          f.Get("bcity"),
-		BpostCode:      f.Get("bpostcode"),
-		Bstate:         f.Get("bstate"),
-		Bstreet:        f.Get("bstreet"),
-		BstreetNumber:  f.Get("bstreetNumber"),
-		City:           f.Get("city"),
-		PostCode:       f.Get("postCode"),
-		ScoreId:        uint(scoreId),
-		State:          f.Get("state"),
-		Street:         f.Get("street"),
-		StreetNumber:   f.Get("streetNumber"),
-		Company:        f.Get("company"),
-		Email:          f.Get("email"),
-		FirstName:      f.Get("firstName"),
-		LastName:       f.Get("lastName"),
-		Salutation:     f.Get("salutation"),
-		Telephone:      f.Get("telephone"),
+		Dcity:         f.Get("dcity"),
+		DpostCode:     f.Get("dpostcode"),
+		Dstate:        f.Get("dstate"),
+		Dstreet:       f.Get("dstreet"),
+		DstreetNumber: f.Get("dstreetNumber"),
+		City:          f.Get("city"),
+		PostCode:      f.Get("postCode"),
+		ScoreId:       uint(scoreId),
+		State:         f.Get("state"),
+		Street:        f.Get("street"),
+		StreetNumber:  f.Get("streetNumber"),
+		Company:       f.Get("company"),
+		Email:         f.Get("email"),
+		FirstName:     f.Get("firstName"),
+		LastName:      f.Get("lastName"),
+		Salutation:    f.Get("salutation"),
+		Telephone:     f.Get("telephone"),
 	}
 	order := (&o).Order()
 	err = InsertNewOrder(order)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		log(context.LOG_ERROR, "error occurred while persisting a new order: %s", err.Error())
+		http.Redirect(rw, r, context.Conf.OrderRefer.Host+context.Conf.OrderRefer.Fail, http.StatusMovedPermanently)
+	} else {
+		http.Redirect(rw, r, context.Conf.OrderRefer.Host+context.Conf.OrderRefer.Success, http.StatusMovedPermanently)
 	}
 	err = notify(order)
 	if err != nil {

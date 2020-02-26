@@ -22,7 +22,9 @@ type Configuration struct {
 	JWTSecret            string           `json:"jwtSecret"`
 	SQLiteFile           string           `json:"sqliteFile"`
 	Mail                 EmailCredentials `json:"mail"`
+	OrderRefer           OrderRefer       `json:"orderRefer"`
 	OrderRetrievers      []*mail.Address  `json:"orderRetrievers"`
+	RestMirror           RestMirror       `json:"restMirror"`
 	TemplateInterval     uint             `json:"templateInterval"`
 }
 
@@ -39,6 +41,13 @@ type EmailCredentials struct {
 	Password string        `json:"password"`
 	SMTPHost string        `json:"smtpHost"`
 	Address  *mail.Address `json:"address"`
+}
+
+//Struct for refers after order
+type OrderRefer struct {
+	Host    string `json:"host"`
+	Fail    string `json:"fail"`
+	Success string `json:"success"`
 }
 
 //Returns a default configuration with a generated jwt secret.
@@ -67,11 +76,30 @@ func defaultConf() *Configuration {
 		JWTSecret:            fmt.Sprintf("%x", secret),
 		SQLiteFile:           "core.sqlite",
 		TemplateInterval:     5,
+		RestMirror: RestMirror{
+			Interval:           5,
+			CategoriesPath:     "categories.json",
+			CategoriesFlatPath: "categoriesflat.json",
+			ScoresPath:         "scores.json",
+		},
+		OrderRefer: OrderRefer{
+			Host:    "http://localhost:1313",
+			Fail:    "/orderfailed",
+			Success: "/ordered",
+		},
 		OrderRetrievers: []*mail.Address{
 			{
 				Name:    "Max Mustermann",
 				Address: "max.mustermann@mail.example.org",
 			}}}
+}
+
+//section for the rest mirror
+type RestMirror struct {
+	Interval           uint   `json:"interval"`
+	CategoriesPath     string `json:"categoriesPath"`
+	CategoriesFlatPath string `json:"categoriesFlatPath"`
+	ScoresPath         string `json:"scoresPath"`
 }
 
 //Reads configuration from file and creates one if it does not exist yet.
