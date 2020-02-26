@@ -2,10 +2,28 @@ To: {{ .To }}
 From: {{ .From }}
 Subject: Jemand hat etwas bestellt
 Date: {{ .Date }}
+X-Attached: {{ .Attachment.Filename }}
+Content-Type: multipart/mixed;boundary=---------------------{{ .Boundary }}
+
+-----------------------{{ .Boundary }}
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;charset=utf-8
+
 
 {{ .Order.FirstName }} {{ .Order.LastName}} hat {{ .Order.Score.Title }} bestellt.
 Die Kontaktdaten sind:
-    Adresse: {{ .Order.DeliveryAddress.Street }} {{ .Order.DeliveryAddress.StreetNumber}}, {{ .Order.DeliveryAddress.PostCode}} {{ .Order.DeliveryAddress.City }}, {{ .Order.DeliveryAddress.State }}
+    Adresse: {{ .Order.BillingAddress.Street }} {{ .Order.BillingAddress.StreetNumber}}, {{ .Order.BillingAddress.PostCode}} {{ .Order.BillingAddress.City }}, {{ .Order.BillingAddress.State.Name }}
     Email: {{ .Order.Email }}
     Firma: {{ .Order.Company }}
     Telefon: {{ .Order.Telephone }}
+
+
+
+
+-----------------------{{ .Boundary }}
+Content-Type: application/pdf; filename="{{ .Attachment.Filename }}"; name="{{ .Attachment.Filename }}"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="{{ .Attachment.Filename }}"; name="{{ .Attachment.Filename }}"
+
+{{ .Attachment.Data }}
+-----------------------{{ .Boundary }}--

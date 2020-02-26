@@ -2,9 +2,12 @@ package rest
 
 import (
 	"bytes"
+	"encoding/base64"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
+	"github.com/mknentwich/core/pdf"
 	"github.com/mknentwich/core/utils"
+	"io/ioutil"
 	"net"
 	"net/mail"
 	"net/smtp"
@@ -20,10 +23,17 @@ const (
 )
 
 type MailData struct {
-	Order *database.Order
-	Date  string
-	To    string
-	From  string
+	Order      *database.Order
+	Date       string
+	To         string
+	From       string
+	Attachment Attachment
+	Boundary   string
+}
+
+type Attachment struct {
+	Filename string
+	Data     string
 }
 
 var customerMailBody *template.Template
@@ -63,11 +73,26 @@ func notifyOwner(order *database.Order) error {
 	for i, v := range context.Conf.OrderRetrievers {
 		mails[i] = v.String()
 	}
+	pdfreader, filename, err := pdf.GeneratePDF(int(order.ID))
+	if err != nil {
+		return err
+	}
+	base64data, err := ioutil.ReadAll(pdfreader)
+	if err != nil {
+		return err
+	}
+	attachment := &Attachment{
+		Filename: filename,
+		Data:     base64.RawStdEncoding.EncodeToString(base64data),
+	}
+
 	data := &MailData{
-		Order: order,
-		Date:  time.Now().Format(mailDateFormat),
-		To:    strings.Join(mails, ","),
-		From:  context.Conf.Mail.Address.String(),
+		Order:      order,
+		Date:       time.Now().Format(mailDateFormat),
+		To:         strings.Join(mails, ","),
+		From:       context.Conf.Mail.Address.String(),
+		Attachment: *attachment,
+		Boundary:   "3809e216f78f1a242b12e913a8d3c6b0",
 	}
 	return sendMail(ownerMailBody, context.Conf.OrderRetrievers, data)
 }
