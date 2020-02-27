@@ -1,7 +1,10 @@
 To: {{ .To }}
 From: {{ .From }}
-Subject: Bestellung "{{ .Order.Score.Title }}" bei Markus Nentwich
+Subject: Ihre Bestellung bei Markus Nentwich
 Date: {{ .Date }}
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;charset=utf-8
+
 
 Guten Tag,
 
@@ -9,10 +12,12 @@ vielen Dank für Ihre Bestellung bei Markus Nentwich.
 Der Artikel "{{ .Order.Score.Title }}" wird zum Versand vorbereitet und anschließend an folgende Adresse geliefert:
 
 {{ if .Order.DeliveryAddress.Street }}
+{{ .Order.FirstName }} {{ .Order.LastName }}
 {{ .Order.DeliveryAddress.Street }} {{ .Order.DeliveryAddress.StreetNumber}}
 {{ .Order.DeliveryAddress.PostCode}} {{ .Order.DeliveryAddress.City }}
-{{ .Order.DeliveryAddress.State.Name }}.
+{{ .Order.DeliveryAddress.State.Name }}
 {{ else }}
+{{ .Order.FirstName }} {{ .Order.LastName }}
 {{ .Order.BillingAddress.Street }} {{ .Order.BillingAddress.StreetNumber}}
 {{ .Order.BillingAddress.PostCode}} {{ .Order.BillingAddress.City }}
 {{ .Order.BillingAddress.State.Name }}
@@ -20,5 +25,7 @@ Der Artikel "{{ .Order.Score.Title }}" wird zum Versand vorbereitet und anschlie
 
 Die Sendung enthält die Rechnung ihrer Bestellung, die ich Sie bitte, gemäß der enthaltenen Anweisung einzuzahlen.
 
+
 Mit freundlichen Grüßen,
+
 Markus Nentwich
