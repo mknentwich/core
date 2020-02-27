@@ -177,7 +177,7 @@ func insertTestData2() {
 		err.Error()
 	}
 	order = database.Order{
-		BillingAddress: &database.Address{
+		DeliveryAddress: &database.Address{
 			City:     "",
 			PostCode: "",
 			State: &database.State{
@@ -187,17 +187,17 @@ func insertTestData2() {
 			Street:       "",
 			StreetNumber: "",
 		},
-		Company:         "",
-		Date:            10022018,
-		DeliveryAddress: &address,
-		Email:           "hpberger@spengergasse.at",
-		FirstName:       "Hans-Peter",
-		LastName:        "Berger",
-		Payed:           true,
-		Salutation:      "Herr",
-		Score:           score,
-		ScoreAmount:     1,
-		Telephone:       "",
+		Company:        "",
+		Date:           10022018,
+		BillingAddress: &address,
+		Email:          "hpberger@spengergasse.at",
+		FirstName:      "Hans-Peter",
+		LastName:       "Berger",
+		Payed:          true,
+		Salutation:     "Herr",
+		Score:          score,
+		ScoreAmount:    1,
+		Telephone:      "",
 	}
 	err = rest.SaveOrder(order)
 	if err != nil {

@@ -164,7 +164,7 @@ func loadAddressesCustomer(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 	pdf.SetX(marginSide)
 	pdf.SetY(marginCustomerAddress)
 
-	if billData.BillingAddress.Street != "" {
+	if billData.Street != "" {
 		pdf.SetFontStyle("b")
 		pdf.Cell(cellWidthMax, sizeText, translator("Rechnungsadresse:"))
 		pdf.SetFontStyle("")
@@ -180,7 +180,7 @@ func loadAddressesCustomer(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 	pdf.Ln(sizeText / 2)
 	pdf.Cell(cellWidthMax, sizeText, translator(billData.FirstName+" "+billData.LastName))
 	pdf.Ln(sizeText / 2)
-	if billData.BillingAddress.Street != "" {
+	if billData.Street != "" {
 		//use billing Address first
 		pdf.Cell(cellWidthMax, sizeText, translator(billData.BillingAddress.Street+" "+billData.BillingAddress.StreetNumber))
 		pdf.Ln(sizeText / 2)
@@ -206,12 +206,12 @@ func loadAddressesCustomer(pdf *gofpdf.Fpdf) *gofpdf.Fpdf {
 		pdf.SetX(4.5 * marginSide)
 		pdf.Cell(cellWidthMax/2, sizeText, translator(billData.Name))
 	} else {
-		//use delivery Address only
-		pdf.Cell(cellWidthMax, sizeText, translator(billData.Street+" "+billData.StreetNumber))
+		//use billing Address only
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.BillingAddress.Street+" "+billData.BillingAddress.StreetNumber))
 		pdf.Ln(sizeText / 2)
-		pdf.Cell(cellWidthMax, sizeText, translator(billData.PostCode+" "+billData.City))
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.BillingAddress.PostCode+" "+billData.BillingAddress.City))
 		pdf.Ln(sizeText / 2)
-		pdf.Cell(cellWidthMax, sizeText, translator(billData.Name))
+		pdf.Cell(cellWidthMax, sizeText, translator(billData.BillingAddress.Name))
 	}
 	return pdf
 }
