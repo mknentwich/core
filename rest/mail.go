@@ -82,7 +82,7 @@ func notifyOwner(order *database.Order) error {
 		return err
 	}
 	attachment := &Attachment{
-		Filename: filename,
+		Filename: "Rechnung_" + filename + ".pdf",
 		Data:     fold(base64.StdEncoding.EncodeToString(base64data), 76-1),
 	}
 	data := &MailData{
