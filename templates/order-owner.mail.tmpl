@@ -10,12 +10,23 @@ Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;charset=utf-8
 
 
-{{ .Order.FirstName }} {{ .Order.LastName}} hat {{ .Order.Score.Title }} bestellt.
+{{ .Order.FirstName }} {{ .Order.LastName}} hat "{{ .Order.Score.Title }}" bestellt.
+
+
+
 Die Kontaktdaten sind:
-    Adresse: {{ .Order.BillingAddress.Street }} {{ .Order.BillingAddress.StreetNumber}}, {{ .Order.BillingAddress.PostCode}} {{ .Order.BillingAddress.City }}, {{ .Order.BillingAddress.State.Name }}
-    Email: {{ .Order.Email }}
-    Firma: {{ .Order.Company }}
-    Telefon: {{ .Order.Telephone }}
+
+Rechnungsadresse: {{ .Order.BillingAddress.Street }} {{ .Order.BillingAddress.StreetNumber}}, {{ .Order.BillingAddress.PostCode}} {{ .Order.BillingAddress.City }}, {{ .Order.BillingAddress.State.Name }}
+{{ if .Order.DeliveryAddress.Street }}
+Lieferadresse: {{ .Order.DeliveryAddress.Street }} {{ .Order.DeliveryAddress.StreetNumber}}, {{ .Order.DeliveryAddress.PostCode}} {{ .Order.DeliveryAddress.City }}, {{ .Order.DeliveryAddress.State.Name }}
+{{ else }}
+Lieferadresse: siehe Rechnungsadresse
+{{ end }}
+E-Mail: {{ .Order.Email }}
+
+Firma/Verein: {{ .Order.Company }}
+
+Telefon: {{ .Order.Telephone }}
 
 
 
