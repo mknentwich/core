@@ -68,11 +68,11 @@ func postOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	o := PostedOrder{
-		Dcity:         f.Get("dcity"),
-		DpostCode:     f.Get("dpostcode"),
-		Dstate:        f.Get("dstate"),
-		Dstreet:       f.Get("dstreet"),
-		DstreetNumber: f.Get("dstreetNumber"),
+		Dcity:         f.Get("dCity"),
+		DpostCode:     f.Get("dPostCode"),
+		Dstate:        f.Get("dState"),
+		Dstreet:       f.Get("dStreet"),
+		DstreetNumber: f.Get("dStreetNumber"),
 		City:          f.Get("city"),
 		PostCode:      f.Get("postCode"),
 		ScoreId:       uint(scoreId),
