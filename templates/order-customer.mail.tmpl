@@ -1,9 +1,24 @@
 To: {{ .To }}
 From: {{ .From }}
-Subject: Bestellung "{{ .Order.Score.Title }}" in Bearbeitung
+Subject: Ihre Bestellung "{{ .Order.Score.Title }}" bei Markus Nentwich
 Date: {{ .Date }}
 
-Sehr geehrte/r {{ .Order.Salutation }} {{ .Order.LastName }},
+Guten Tag,
 
-Ihre Bestellung "{{ .Order.Score.Title }}" wird nun an die folgende Adresse versandt: {{ .Order.DeliveryAddress.Street }} {{ .Order.DeliveryAddress.StreetNumber}}, {{ .Order.DeliveryAddress.PostCode}} {{ .Order.DeliveryAddress.City }}, {{ .Order.DeliveryAddress.State.Name }}.
-Die Bestellung enthält ein Exemplar der Rechnung, die ich Sie bitte gemäß der enthaltenen Anweisung einzuzahlen.
+vielen Dank für Ihre Bestellung bei Markus Nentwich.
+Der Artikel "{{ .Order.Score.Title }}" wird zum Versand vorbereitet und anschließend an folgende Adresse geliefert:
+
+{{ if .Order.DeliveryAddress.Street }}
+{{ .Order.DeliveryAddress.Street }} {{ .Order.DeliveryAddress.StreetNumber}}
+{{ .Order.DeliveryAddress.PostCode}} {{ .Order.DeliveryAddress.City }}
+{{ .Order.DeliveryAddress.State.Name }}.
+{{ else }}
+{{ .Order.BillingAddress.Street }} {{ .Order.BillingAddress.StreetNumber}}
+{{ .Order.BillingAddress.PostCode}} {{ .Order.BillingAddress.City }}
+{{ .Order.BillingAddress.State.Name }}
+{{ end }}
+
+Die Sendung enthält die Rechnung ihrer Bestellung, die ich Sie bitte, gemäß der enthaltenen Anweisung einzuzahlen.
+
+Mit freundlichen Grüßen,
+Markus Nentwich
