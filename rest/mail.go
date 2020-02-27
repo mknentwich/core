@@ -83,9 +83,8 @@ func notifyOwner(order *database.Order) error {
 	}
 	attachment := &Attachment{
 		Filename: filename,
-		Data:     base64.RawStdEncoding.EncodeToString(base64data),
+		Data:     fold(base64.StdEncoding.EncodeToString(base64data), 76-1),
 	}
-
 	data := &MailData{
 		Order:      order,
 		Date:       time.Now().Format(mailDateFormat),
@@ -95,6 +94,20 @@ func notifyOwner(order *database.Order) error {
 		Boundary:   "3809e216f78f1a242b12e913a8d3c6b0",
 	}
 	return sendMail(ownerMailBody, context.Conf.OrderRetrievers, data)
+}
+
+func fold(s string, n int) string {
+	var buffer bytes.Buffer
+	var n1 = n - 1
+	var l1 = len(s) - 1
+	for i, rn := range s {
+		buffer.WriteRune(rn)
+		if i%n == n1 && i != l1 {
+			buffer.WriteRune('\r')
+			buffer.WriteRune('\n')
+		}
+	}
+	return buffer.String()
 }
 
 func sendMail(mailBody *template.Template, retriever []*mail.Address, data *MailData) error {
