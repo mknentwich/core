@@ -103,3 +103,25 @@ func (order *Order) BeforeSave(db *gorm.DB) (err error) {
 	}
 	return
 }
+
+//Trigger for addresses, that ensures, that every addresses.state has a deliveryPrice and is only
+//stored once in the database
+func (address *Address) BeforeSave(db *gorm.DB) (err error) {
+	if address.State.Name != "" && address.State.DeliveryPrice == 0 {
+		var count = 0
+		db.Table("states").Where("name = ?", address.State.Name).Count(&count)
+		if count == 0 {
+			switch address.State.Name {
+			case "Österreich":
+				address.State.DeliveryPrice = 3
+			default:
+				address.State.DeliveryPrice = 7
+			}
+		} else {
+			var foundState = State{}
+			db.Table("states").Where("name = ?", address.State.Name).Scan(&foundState)
+			address.State = &foundState
+		}
+	}
+	return
+}
