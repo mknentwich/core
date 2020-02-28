@@ -242,8 +242,14 @@ func loadArticles(pdf *gofpdf.Fpdf) float64 {
 	if price >= freeDelivery {
 		pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator("0.00 €"), "B", 1, "R", false, 0, "")
 	} else {
-		pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", billData.DeliveryPrice)+" €"), "B", 1, "R", false, 0, "")
-		price += billData.DeliveryPrice
+		if billData.Street != "" {
+			pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", billData.DeliveryPrice)+" €"), "B", 1, "R", false, 0, "")
+			price += billData.DeliveryPrice
+		} else {
+			pdf.CellFormat(cellWidthMax/9*1.5, sizeText, translator(fmt.Sprintf("%.2f", billData.BillingAddress.DeliveryPrice)+" €"), "B", 1, "R", false, 0, "")
+			price += billData.BillingAddress.DeliveryPrice
+		}
+
 	}
 	pdf.SetFontStyle("b")
 	pdf.CellFormat(cellWidthMax/9, sizeText, "", "", 0, "", false, 0, "")
