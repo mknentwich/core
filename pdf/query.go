@@ -29,11 +29,12 @@ type OrderResultPDF struct {
 
 //BillingAddress for the OrderResultPDF
 type BillingAddress struct {
-	City         string
-	PostCode     string
-	Street       string
-	StreetNumber string
-	Name         string
+	City          string
+	PostCode      string
+	Street        string
+	StreetNumber  string
+	Name          string
+	DeliveryPrice float64
 }
 
 //Selects order by ID and serves a result struct for better bill handling
@@ -51,7 +52,7 @@ func QueryOrderFromIdForPDF(id int) (OrderResultPDF, error) {
 	if recordNotFound {
 		return pdfOrderResult, errors.New("QueryOrderFromIdForPDF: Record with orderID not found")
 	}
-	recordNotFound = database.Receive().Table("orders").Select("city, post_code, street, street_number, name").
+	recordNotFound = database.Receive().Table("orders").Select("city, post_code, street, street_number, name, delivery_price").
 		Joins("inner join addresses on orders.billing_address_id = addresses.id").
 		Joins("JOIN states on states.id = addresses.state_id").
 		Where("orders.id = ?", id).
