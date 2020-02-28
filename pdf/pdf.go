@@ -79,12 +79,11 @@ func initBankData() *bankData {
 //Initializes the ownAddress struct with static values
 func initOwnAddress() *ownAddress {
 	return &ownAddress{
-		name:   "Markus Nentwich",
-		street: "Vereinsgasse 25/14",
-		city:   "A-1020 Wien",
-		phone:  "Telefon: +43699 / 10329882",
-		//TODO: change email
-		email:   "E-Mail: nentwich94@gmx.at",
+		name:    "Markus Nentwich",
+		street:  "Vereinsgasse 25/14",
+		city:    "A-1020 Wien",
+		phone:   "Telefon: +43699 / 10329882",
+		email:   "E-Mail: kontakt@markus-nentwich.at",
 		website: "Webseite: markus-nentwich.at",
 	}
 }
