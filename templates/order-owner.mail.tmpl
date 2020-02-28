@@ -1,6 +1,6 @@
 To: {{ .To }}
 From: {{ .From }}
-Subject: Jemand hat etwas bestellt
+Subject: {{ .Order.FirstName }} {{ .Order.LastName}} hat etwas bestellt
 Date: {{ .Date }}
 X-Attached: {{ .Attachment.Filename }}
 Content-Type: multipart/mixed;boundary=---------------------{{ .Boundary }}
