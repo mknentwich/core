@@ -17,7 +17,6 @@ import (
 )
 
 const (
-	mailDateFormat   = "Mon, 2 Jan 2006 15:04:05 +0700 "
 	customerTemplate = "order-customer.mail.tmpl"
 	ownerTemplate    = "order-owner.mail.tmpl"
 )
@@ -62,7 +61,7 @@ func notifyCustomer(order *database.Order) error {
 	c := context.Conf
 	data := &MailData{
 		Order: order,
-		Date:  time.Now().Format(mailDateFormat),
+		Date:  time.Now().Format(time.RFC1123),
 		To:    customerAddress.String(),
 		From:  c.Mail.Address.String()}
 	return sendMail(customerMailBody, []*mail.Address{customerAddress}, data)
@@ -87,7 +86,7 @@ func notifyOwner(order *database.Order) error {
 	}
 	data := &MailData{
 		Order:      order,
-		Date:       time.Now().Format(mailDateFormat),
+		Date:       time.Now().Format(time.RFC1123),
 		To:         strings.Join(mails, ","),
 		From:       context.Conf.Mail.Address.String(),
 		Attachment: *attachment,
