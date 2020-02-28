@@ -101,8 +101,7 @@ func TestPDF(t *testing.T) {
 //Inserts TestData to the Database
 func insertTestData() {
 	country = database.State{
-		Name:          "Deutschland",
-		DeliveryPrice: 7,
+		Name: "Deutschland",
 	}
 	address = database.Address{
 		City:         "Leopoldsdorf im wundersc Marchfelde",
@@ -138,7 +137,7 @@ func insertTestData() {
 		Payed:           false,
 		Salutation:      "Herr",
 		Score:           score,
-		ScoreAmount:     3,
+		ScoreAmount:     2,
 		Telephone:       "+4954783907",
 	}
 	err = rest.SaveOrder(order)
@@ -150,8 +149,7 @@ func insertTestData() {
 //Inserts TestData to the Database
 func insertTestData2() {
 	country = database.State{
-		Name:          "Österreich",
-		DeliveryPrice: 3,
+		Name: "Österreich",
 	}
 	address = database.Address{
 		City:         "Wien",
@@ -181,8 +179,7 @@ func insertTestData2() {
 			City:     "",
 			PostCode: "",
 			State: &database.State{
-				Name:          "",
-				DeliveryPrice: 0,
+				Name: "",
 			},
 			Street:       "",
 			StreetNumber: "",
@@ -207,8 +204,7 @@ func insertTestData2() {
 
 func insertTestData3() {
 	country = database.State{
-		Name:          "Österreich",
-		DeliveryPrice: 3,
+		Name: "Österreich",
 	}
 	address = database.Address{
 		City:         "Leopoldsdorf im Marchfelde",
