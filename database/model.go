@@ -2,7 +2,9 @@ package database
 
 import (
 	"database/sql"
+	"encoding/json"
 	"github.com/jinzhu/gorm"
+	"github.com/mknentwich/core/utils"
 	"strconv"
 	"time"
 )
@@ -32,6 +34,26 @@ type Category struct {
 	Scores   []Score `gorm:"foreignkey:CategoryID" json:"scores"`
 }
 
+type CategoryJSON struct {
+	gorm.Model
+	Children      []Category `json:"children"`
+	Name          string     `json:"name"`
+	Parent        *Category
+	Scores        []Score `json:"scores"`
+	SanitizedName string  `json:"sanitizedName"`
+}
+
+func (c Category) MarshalJSON() ([]byte, error) {
+	return json.Marshal(CategoryJSON{
+		Model:         c.Model,
+		Children:      c.Children,
+		Name:          c.Name,
+		Parent:        c.Parent,
+		Scores:        c.Scores,
+		SanitizedName: utils.SanitizePath(c.Name),
+	})
+}
+
 type Score struct {
 	gorm.Model
 	Category   *Category
@@ -39,6 +61,26 @@ type Score struct {
 	Difficulty int     `json:"difficulty"`
 	Price      float64 `json:"price"`
 	Title      string  `json:"title"`
+}
+
+type ScoreJSON struct {
+	gorm.Model
+	Category      *Category
+	Difficulty    int     `json:"difficulty"`
+	Price         float64 `json:"price"`
+	Title         string  `json:"title"`
+	SanitizedName string  `json:"sanitizedName"`
+}
+
+func (s Score) MarshalJSON() ([]byte, error) {
+	return json.Marshal(ScoreJSON{
+		Model:         s.Model,
+		Category:      s.Category,
+		Difficulty:    s.Difficulty,
+		Price:         s.Price,
+		Title:         s.Title,
+		SanitizedName: utils.SanitizePath(s.Title),
+	})
 }
 
 type Order struct {
@@ -110,7 +152,7 @@ func (address *Address) BeforeSave(db *gorm.DB) (err error) {
 	if address.State.DeliveryPrice == 0 {
 		var count = 0
 		db.Table("states").Where("name = ?", address.State.Name).Count(&count)
-		if count == 0 && address.State.Name != ""{
+		if count == 0 && address.State.Name != "" {
 			switch address.State.Name {
 			case "Österreich":
 				address.State.DeliveryPrice = 3
