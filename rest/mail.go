@@ -61,7 +61,7 @@ func notifyCustomer(order *database.Order) error {
 	c := context.Conf
 	data := &MailData{
 		Order: order,
-		Date:  time.Now().Format(time.RFC1123),
+		Date:  time.Now().Format(time.RFC1123Z),
 		To:    customerAddress.String(),
 		From:  c.Mail.Address.String()}
 	return sendMail(customerMailBody, []*mail.Address{customerAddress}, data)
@@ -86,7 +86,7 @@ func notifyOwner(order *database.Order) error {
 	}
 	data := &MailData{
 		Order:      order,
-		Date:       time.Now().Format(time.RFC1123),
+		Date:       time.Now().Format(time.RFC1123Z),
 		To:         strings.Join(mails, ","),
 		From:       context.Conf.Mail.Address.String(),
 		Attachment: *attachment,
