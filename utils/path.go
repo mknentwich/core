@@ -7,7 +7,7 @@ var safePendants = map[rune]string{
 	'ö':  "oe",
 	'ü':  "ue",
 	'ß':  "ss",
-	' ':  "-",
+	' ':  "",
 	'/':  "-",
 	'\\': "-",
 	'\n': "-",
