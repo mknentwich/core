@@ -2,6 +2,7 @@ package template
 
 import (
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"github.com/mknentwich/core/context"
 	"github.com/mknentwich/core/database"
 	"github.com/mknentwich/core/rest"
@@ -34,6 +35,8 @@ func Generate() error {
 		log(context.LOG_WARNING, "failed to wipe template directory: %s", err.Error())
 	}
 	generateCategories(rest.QueryCategoriesWithChildrenAndScores().([]database.Category), tmpl, scoreTmpl, outDir, ending, scoreEnding)
+	rootCategory := database.Category{Name: "Übersicht", Model: gorm.Model{ID: 0}}
+	generateCategory(&rootCategory, tmpl, scoreTmpl, outDir, ending, scoreEnding)
 	return nil
 }
 
@@ -78,6 +81,9 @@ func generateCategories(categories []database.Category, tmpl *template.Template,
 
 func generateCategory(category *database.Category, tmpl *template.Template, scoreTmpl *template.Template, parentOutDir string, ending, scoreEnding string) {
 	outDir := path.Join(parentOutDir, utils.SanitizePath(category.Name))
+	if category.ID == 0 {
+		outDir = parentOutDir
+	}
 	err := os.Mkdir(outDir, 0700)
 	generateCategories(category.Children, tmpl, scoreTmpl, outDir, ending, scoreEnding)
 	for _, score := range category.Scores {
