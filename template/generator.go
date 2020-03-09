@@ -87,6 +87,7 @@ func generateCategory(category *database.Category, tmpl *template.Template, scor
 	err := os.Mkdir(outDir, 0700)
 	generateCategories(category.Children, tmpl, scoreTmpl, outDir, ending, scoreEnding)
 	for _, score := range category.Scores {
+		(&score).Category = category
 		generateScore(&score, scoreTmpl, outDir, scoreEnding)
 	}
 	file, err := os.OpenFile(path.Join(outDir, "_index")+ending, os.O_CREATE|os.O_RDWR, 0700)
