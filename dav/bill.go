@@ -39,3 +39,10 @@ type BillFile struct {
 
 type BillCollectionFile struct {
 }
+
+type billFilter struct {
+	payed *bool
+	month *int
+	year  *int
+	id    *int
+}

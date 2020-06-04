@@ -2,6 +2,7 @@ package dav
 
 import (
 	"github.com/mknentwich/core/context"
+	"github.com/mknentwich/core/database"
 	"golang.org/x/net/webdav"
 	"math/rand"
 	"os"
@@ -9,15 +10,13 @@ import (
 	"time"
 )
 
-var tree PhantomNode
+var tree *BasicNode
 
 type PhantomNode interface {
 	Children() []PhantomNode
 	File() webdav.File
 	Name() string
 	Subset(string) PhantomNode
-
-	append(string, PhantomNode)
 }
 
 type BasicNode struct {
@@ -26,6 +25,8 @@ type BasicNode struct {
 }
 
 func (b *BasicNode) Children() []PhantomNode {
+	//np := *b
+	//n, err := np.(*CategoryNode)
 	return b.children
 }
 
@@ -44,7 +45,7 @@ func (b *BasicNode) Subset(path string) PhantomNode {
 		return b
 	}
 	name := strings.Split(path, separator)[0]
-	for _, child := range b.children {
+	for _, child := range b.Children() {
 		if child.Name() == name {
 			if len(name) == len(path) {
 				return child
@@ -68,25 +69,28 @@ func (b *BasicNode) append(path string, node PhantomNode) {
 			next = newBasicNode(nextName)
 			b.children = append(b.children, next)
 		}
-		next.append(path[len(nextName):], node)
+		nextBasic, ok := next.(*BasicNode)
+		if ok {
+			nextBasic.append(path[len(nextName):], node)
+		}
 	}
 }
 
 type BasicFile struct {
 	os.File
-	node *BasicNode
+	node PhantomNode
 }
 
 func (b *BasicFile) Readdir(count int) ([]os.FileInfo, error) {
 	childrenAmount := count
-	if count == 0 || len(b.node.children) < count {
-		childrenAmount = len(b.node.children)
+	if count == 0 || len(b.node.Children()) < count {
+		childrenAmount = len(b.node.Children())
 	}
 	infos := make([]os.FileInfo, childrenAmount)
 	var finalError error
 	var err error
 	for i := 0; i < childrenAmount; i++ {
-		infos[i], err = b.node.children[i].File().Stat()
+		infos[i], err = b.node.Children()[i].File().Stat()
 		if err != nil {
 			finalError = err
 		}
@@ -99,7 +103,7 @@ func (b *BasicFile) Stat() (os.FileInfo, error) {
 }
 
 type BasicStat struct {
-	node *BasicNode
+	node PhantomNode
 }
 
 func (b BasicStat) Name() string {
@@ -136,7 +140,9 @@ func initializeTree() {
 
 	appendFullPath(paths.UnpayedBills, newBillCollectionNode(false))
 
-	//appendFullPath(paths.Scores, &ScoreCollectionNode{})
+	rootCategory := newCategoryNode(&database.Category{Name: paths.Scores}, "")
+	rootCategory.root = true
+	appendFullPath(paths.Scores, rootCategory)
 }
 
 func appendFullPath(path string, node PhantomNode) {
